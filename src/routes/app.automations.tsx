@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { automations, executionLogs } from "@/services/mock/analytics";
-import { useState } from "react";
+import { automations as seedAutomations, executionLogs } from "@/services/mock/analytics";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Play, Pause, Plus, Zap, Database, Brain, MessageSquare, Mic, Webhook, Clock, GitBranch, Filter, Sparkles, X } from "lucide-react";
