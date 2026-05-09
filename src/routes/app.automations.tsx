@@ -151,8 +151,8 @@ function AutomationsPage() {
               <span className="text-[10px] font-mono text-muted-foreground">trigger: {current.trigger}</span>
             </div>
             <div className="flex items-center gap-2">
-              <button className="text-xs text-muted-foreground hover:text-foreground p-1"><Pause className="w-3.5 h-3.5" /></button>
-              <button className="text-xs text-primary hover:text-primary/80 p-1"><Play className="w-3.5 h-3.5" /></button>
+              <button onClick={() => togglePlay("paused")} disabled={current.status === "paused"} className="text-xs text-muted-foreground hover:text-foreground p-1 disabled:opacity-40"><Pause className="w-3.5 h-3.5" /></button>
+              <button onClick={() => togglePlay("active")} disabled={current.status === "active"} className="text-xs text-primary hover:text-primary/80 p-1 disabled:opacity-40"><Play className="w-3.5 h-3.5" /></button>
             </div>
           </div>
 
