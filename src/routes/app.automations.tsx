@@ -219,18 +219,18 @@ function AutomationsPage() {
               </div>
               <div className="font-display text-base flex items-center gap-2">{selectedNode.icon} {selectedNode.label}</div>
               <div className="border-t border-border -mx-4" />
-              <div className="space-y-3 text-xs">
+              <div key={selectedNode.id} className="space-y-3 text-xs">
                 <div>
                   <div className="font-mono uppercase text-[10px] text-muted-foreground mb-1">Display name</div>
-                  <input defaultValue={selectedNode.label} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm" />
+                  <input value={cfg!.name} onChange={(e) => updateCfg({ name: e.target.value })} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm" />
                 </div>
                 <div>
                   <div className="font-mono uppercase text-[10px] text-muted-foreground mb-1">Timeout (ms)</div>
-                  <input type="number" defaultValue={5000} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm font-mono" />
+                  <input type="number" value={cfg!.timeout} onChange={(e) => updateCfg({ timeout: Number(e.target.value) })} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm font-mono" />
                 </div>
                 <div>
                   <div className="font-mono uppercase text-[10px] text-muted-foreground mb-1">Retry policy</div>
-                  <select className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm">
+                  <select value={cfg!.retry} onChange={(e) => updateCfg({ retry: e.target.value })} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm">
                     <option>Exponential (3 attempts)</option>
                     <option>Linear (5 attempts)</option>
                     <option>None</option>
@@ -238,11 +238,11 @@ function AutomationsPage() {
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-border">
                   <span className="text-muted-foreground">Continue on error</span>
-                  <Switch />
+                  <Switch checked={cfg!.continueOnError} onCheckedChange={(v) => updateCfg({ continueOnError: v })} />
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Log payload</span>
-                  <Switch defaultChecked />
+                  <Switch checked={cfg!.logPayload} onCheckedChange={(v) => updateCfg({ logPayload: v })} />
                 </div>
               </div>
               <div className="border-t border-border -mx-4 pt-3 mt-3 px-4">
