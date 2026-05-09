@@ -40,10 +40,6 @@ function Landing() {
         </svg>
 
         <div className="relative max-w-6xl mx-auto text-center">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full glass text-xs font-mono uppercase tracking-wider text-muted-foreground mb-8">
-            <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse" />
-            v1.4 — claude-sonnet-4-5 live
-          </div>
           <h1 className="font-display text-5xl md:text-7xl lg:text-8xl tracking-tight leading-[0.95]">
             Your ICP just became<br />
             <span className="text-gradient">a war room.</span>
