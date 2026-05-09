@@ -41,13 +41,6 @@ export function TopBar() {
           <Moon className="w-4 h-4" />
         </button>
         <button
-          onClick={handleLogout}
-          title="Sign out"
-          className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-white/5 text-muted-foreground hover:text-foreground"
-        >
-          <LogOut className="w-4 h-4" />
-        </button>
-        <button
           onClick={() => setOpen(true)}
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-primary-foreground"
           style={{ background: "var(--gradient-primary)" }}
