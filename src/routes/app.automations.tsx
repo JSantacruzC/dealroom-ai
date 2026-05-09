@@ -129,6 +129,8 @@ function AutomationsPage() {
                 key={n.label}
                 className="border border-border rounded p-2 bg-surface/40 cursor-grab hover:border-primary/40 hover:bg-surface/70 transition-all flex items-center gap-2 text-xs"
                 draggable
+                onDragStart={(e) => e.dataTransfer.setData("application/x-node", JSON.stringify({ label: n.label }))}
+                onClick={() => { setExtraNodes((m) => ({ ...m, [baseCurrent.id]: [...(m[baseCurrent.id] ?? []), { label: n.label, icon: ({ Webhook: "🪝", Schedule: "⏰", "Clay Enrich": "🧪", "ICP Filter": "🎯", "Gemini Reason": "🧠", "Generate Copy": "✨", "Slack Post": "💬", "ElevenLabs TTS": "🎙️", Branch: "🔀" } as Record<string,string>)[n.label] ?? "▢" }] })); toast.success(`${n.label} added`); }}
               >
                 <Icon className={`w-3.5 h-3.5 ${n.color === "primary" ? "text-primary" : n.color === "accent" ? "text-accent" : n.color === "success" ? "text-[oklch(0.75_0.15_165)]" : "text-warning"}`} />
                 <span className="truncate">{n.label}</span>
