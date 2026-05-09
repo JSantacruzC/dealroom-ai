@@ -1,10 +1,19 @@
-import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router";
+import { createFileRoute, Outlet, useRouterState, redirect } from "@tanstack/react-router";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { CommandPalette } from "@/components/layout/CommandPalette";
 import { motion, AnimatePresence } from "framer-motion";
+import { useAuthStore } from "@/store/auth";
 
 export const Route = createFileRoute("/app")({
+  beforeLoad: ({ location }) => {
+    if (typeof window === "undefined") return;
+    // wait for hydration on first call
+    const state = useAuthStore.getState();
+    if (!state.user) {
+      throw redirect({ to: "/login", search: { redirect: location.href } });
+    }
+  },
   component: AppShell,
 });
 
