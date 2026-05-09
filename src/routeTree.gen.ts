@@ -23,6 +23,7 @@ import { Route as AppIntegrationsRouteImport } from './routes/app.integrations'
 import { Route as AppDealroomsRouteImport } from './routes/app.dealrooms'
 import { Route as AppAutomationsRouteImport } from './routes/app.automations'
 import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AppDealroomsIdRouteImport } from './routes/app.dealrooms.$id'
 
 const SignupRoute = SignupRouteImport.update({
@@ -95,6 +96,11 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppDealroomsIdRoute = AppDealroomsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -107,6 +113,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
@@ -124,6 +131,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
@@ -142,6 +150,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
@@ -161,6 +170,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/api/chat'
     | '/app/analytics'
     | '/app/automations'
     | '/app/dealrooms'
@@ -178,6 +188,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/api/chat'
     | '/app/analytics'
     | '/app/automations'
     | '/app/dealrooms'
@@ -195,6 +206,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/api/chat'
     | '/app/analytics'
     | '/app/automations'
     | '/app/dealrooms'
@@ -213,6 +225,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -315,6 +328,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/dealrooms/$id': {
       id: '/app/dealrooms/$id'
       path: '/$id'
@@ -369,7 +389,18 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
