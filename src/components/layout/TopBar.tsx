@@ -1,7 +1,9 @@
-import { Bell, Search, Plus, Moon } from "lucide-react";
+import { Bell, Search, Plus, Moon, LogOut } from "lucide-react";
 import { useUIStore } from "@/store";
 import { NewDealRoomModal } from "@/components/dealrooms/NewDealRoomModal";
 import { useState, useEffect } from "react";
+import { useNavigate } from "@tanstack/react-router";
+import { supabase } from "@/integrations/supabase/client";
 
 export function TopBar() {
   const { setCommandOpen, notifications, resetNotifications, bumpNotification } = useUIStore();
