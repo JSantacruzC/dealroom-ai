@@ -20,7 +20,22 @@ function DealRoomDetail() {
   const stakeholders = useDataStore((s) => s.stakeholders.filter((x) => x.companyId === company.id));
 
   return (
-    <div className="flex h-[calc(100vh-3.5rem)]">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)]">
+      {/* MISSION CONTROL BAR */}
+      <div className="border-b border-border bg-gradient-to-r from-card via-surface/80 to-card px-5 py-3 flex items-center gap-6 overflow-x-auto">
+        <MetricPill label="Momentum" value="↑ 84" tone="success" sub="+12 this wk" />
+        <MetricPill label="Velocity" value="3.2 t/d" tone="accent" sub="touches/day" />
+        <MetricPill label="Coverage" value={`${stakeholders.filter(s=>s.status!=="pending").length}/${stakeholders.length}`} tone="primary" sub="committee" />
+        <MetricPill label="Reply rate" value={`${company.replyRate}%`} tone="primary" sub="vs 22% avg" />
+        <MetricPill label="Risk" value={company.riskFlags.length ? "Med" : "Low"} tone={company.riskFlags.length ? "warning" : "success"} sub={`${company.riskFlags.length} flags`} />
+        <div className="flex-1" />
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-success opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-success" /></span>
+          <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">Gemini live · last sync {company.lastActivity}</span>
+        </div>
+      </div>
+
+      <div className="flex flex-1 overflow-hidden">
       {/* LEFT — Company intel */}
       <aside className="w-[280px] shrink-0 border-r border-border bg-surface/30 overflow-y-auto p-5 space-y-5">
         <div>
@@ -101,6 +116,25 @@ function DealRoomDetail() {
 
       {/* RIGHT — Deal Captain */}
       <DealCaptainPanel companyName={company.name} />
+      </div>
+    </div>
+  );
+}
+
+function MetricPill({ label, value, sub, tone }: { label: string; value: string; sub: string; tone: "primary" | "accent" | "success" | "warning" }) {
+  const toneCls = {
+    primary: "text-primary border-primary/30 bg-primary/5",
+    accent: "text-accent border-accent/30 bg-accent/5",
+    success: "text-[oklch(0.75_0.15_165)] border-success/30 bg-success/5",
+    warning: "text-warning border-warning/30 bg-warning/5",
+  }[tone];
+  return (
+    <div className={`flex items-center gap-3 border rounded-md px-3 py-1.5 shrink-0 ${toneCls}`}>
+      <div>
+        <div className="text-[9px] font-mono uppercase tracking-wider opacity-70">{label}</div>
+        <div className="font-display text-sm leading-tight">{value}</div>
+      </div>
+      <div className="text-[9px] font-mono uppercase tracking-wider opacity-60 border-l border-current/20 pl-3">{sub}</div>
     </div>
   );
 }
