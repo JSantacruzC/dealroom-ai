@@ -1,12 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Zap, Brain, Users, Mic, Link2, BarChart3, ArrowRight, Play } from "lucide-react";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
+import { useState } from "react";
+import { DemoModal } from "@/components/landing/DemoModal";
+import { useAuthStore } from "@/store/auth";
 
 export const Route = createFileRoute("/")({
   component: Landing,
 });
 
 function Landing() {
+  const [demoOpen, setDemoOpen] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const launchTo = user ? "/app/overview" : "/login";
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
