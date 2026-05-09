@@ -143,10 +143,8 @@ export function DemoModal({ open, onOpenChange }: { open: boolean; onOpenChange:
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        showCloseButton={false}
-        className="max-w-3xl p-0 border-border bg-card/95 backdrop-blur-md overflow-hidden"
-      >
+      <DialogContent className="max-w-3xl p-0 border-border bg-card/95 backdrop-blur-md overflow-hidden [&>button.absolute]:hidden">
+
         <div className="relative">
           <div className="absolute inset-0 bg-mesh opacity-30 pointer-events-none" />
           <div className="absolute inset-0 bg-dots opacity-20 pointer-events-none" />
