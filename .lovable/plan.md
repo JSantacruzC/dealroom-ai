@@ -1,69 +1,83 @@
-## Goal
+# Plan de correcciones — DealRoom Orchestrator
 
-Add a real, production-grade Supabase email/password auth system to the existing DealRoom Orchestrator app, and remove the "v1.4 — claude-sonnet-4-5 live" badge from the landing page. Preserve the existing dark design system 1:1.
+Mantengo intacto el diseño, tipografía, sidebar, gradientes y aesthetic premium. Solo se corrige funcionalidad y se añaden controles donde faltan.
 
-## Heads-up before implementing
+## 1. Inicio de sesión funcional (modo mock)
 
-1. **Backend required.** This needs a real Supabase project. I'll enable **Lovable Cloud** (our managed Supabase) — no external account or env vars needed; the client and keys are auto-wired.
-2. **Routing convention.** The app uses **TanStack Router file-based routing** under `src/routes/`, not `src/pages/`. I'll create `src/routes/login.tsx`, `src/routes/signup.tsx`, `src/routes/reset-password.tsx` (functionally equivalent to what you asked, just in the right folder). All other auth file paths follow your spec.
-3. **Protected routes.** I'll convert the existing `/app/*` subtree into a TanStack `_authenticated` layout (the idiomatic guard) — URLs stay identical (`/app/overview`, etc.), no visible change.
-4. **Mock data stays.** Auth gates the existing mock-driven UI; nothing else changes visually or behaviorally.
+Como el backend ya está stripped a mock, el login real de Supabase no encaja. Voy a:
 
-## Scope
+- Reescribir `LoginForm` y `SignUpForm` para usar un **mock auth store** (`useAuthStore` en zustand con `persist` en localStorage). Cualquier email/contraseña válidos crean una sesión local.
+- Reescribir `useAuth` para leer del store (sin Supabase).
+- Añadir `ProtectedRoute` lógico en `/app` (`beforeLoad` redirige a `/login` si no hay sesión).
+- En la landing, el botón **Launch app** y los CTA llevan a `/login` si no hay sesión, o directo a `/app/overview` si sí.
+- Tras login → `/app/overview` con un **onboarding banner** (dismissible) que enlaza a las acciones clave para “empezar a usar la app en serio”: crear DealRoom, importar/añadir stakeholder, conectar integración, configurar ICP. Esto no rediseña nada, solo añade un card en la parte superior del overview con 4 quick-actions.
+- TopBar: añadir avatar con dropdown (perfil + Logout).
 
-### 1. Remove version badge
-- `src/routes/index.tsx` line 45: delete the "v1.4 — claude-sonnet-4-5 live" pill. Surrounding hero layout untouched.
+## 2. Botón “Watch demo” en la landing
 
-### 2. Enable Lovable Cloud
-- Provisions Supabase, generates `src/integrations/supabase/client.ts` + types, wires env. Email confirmation stays ON (default).
+Reemplazar el ancla `#how` por un botón que abre un **DemoModal** (Dialog full-screen sobre fondo oscuro con blur). El modal reproduce un tour guiado autoplay de ~45s:
 
-### 3. Auth library (`src/lib/auth/`)
-- `password.ts` — validator (≥8 chars, upper/lower/digit/special) + strength scorer (weak/medium/strong) + sanitizer (`.trim()`, length cap).
-- `rate-limit.ts` — in-memory failed-attempt tracker keyed by email; 5 strikes → 30s cooldown with countdown.
-- `useAuth.ts` — hook wrapping `getSession` + `onAuthStateChange` (sets up listener BEFORE getSession, per Supabase best practice). Exposes `session`, `user`, `loading`, `signIn/signUp/signOut/resetPassword`.
+- Pasos animados (framer-motion) que recorren mockups de las 5 pantallas clave: ICP trigger → Enrich → DealRoom Mission Control → Captain chat → Analytics.
+- Barra de progreso, controles Play/Pause/Skip, botón “Launch app” al final.
+- Reutiliza estilos existentes (cards, gradientes, dot grid). Sin rediseño.
 
-### 4. Components (`src/components/auth/`)
-- `LoginForm.tsx` — email + password, "Forgot password?", link to signup, generic "Invalid credentials" error, rate-limit feedback, autocomplete attrs.
-- `SignUpForm.tsx` — email + password + confirm, live strength meter (3-segment bar matching design tokens), match validation, success state ("Check your email to confirm").
-- `ResetPasswordForm.tsx` — new + confirm password, strength meter, success toast → redirect `/login`.
-- `PasswordStrengthMeter.tsx` — 3 bars using `--success`, `--warning`, `--destructive` tokens.
-- `ProtectedRoute.tsx` — wrapper used inside the `_authenticated` layout's `beforeLoad`/component to render a centered spinner during session hydration and redirect to `/login` if absent.
-- `Spinner.tsx` — minimal token-based spinner (no existing one in repo).
+## 3. Panel de notificaciones
 
-### 5. Route changes (TanStack file-based)
-- New: `src/routes/login.tsx`, `src/routes/signup.tsx`, `src/routes/reset-password.tsx`. Each renders inside a centered card matching existing `surface`/`border`/`radius` tokens, DM Sans/Mono fonts, gradient primary button — visually consistent with the app shell.
-- New: `src/routes/_authenticated.tsx` — pathless layout with `beforeLoad` that calls `supabase.auth.getUser()`; redirects to `/login` with `redirect` search param when unauthenticated.
-- Move existing `src/routes/app.*.tsx` files into `src/routes/_authenticated/app.*.tsx` (URLs unchanged). `routeTree.gen.ts` regenerates automatically.
-- `TopBar.tsx`: add a logout icon button next to the bell (uses existing icon-button styling, `LogOut` from lucide). Calls `signOut()` then `navigate({to:'/login'})`.
+Reemplazar el botón Bell que solo resetea el contador por un **Popover real** anclado al icono:
 
-### 6. Security details enforced
-- Inputs: controlled, `autocomplete="email"` / `"current-password"` / `"new-password"`, sanitized.
-- Errors: inline under field for validation; toast (existing sonner) for network/Supabase errors with friendly messages mapped from error codes.
-- Session: 100% Supabase-managed (`localStorage`, auto-refresh). No custom token storage.
-- `onAuthStateChange` `SIGNED_OUT` → redirect to `/login`.
-- Reset-password route detects `type=recovery` in URL hash before rendering form.
+- Nuevo store `useNotificationsStore` (zustand + persist) con lista tipada `{id, title, body, type, unreadAt, read}`.
+- TopBar: el `bumpNotification` ahora inyecta una notificación realista desde un pool (nuevo reply, riesgo detectado, reunión reservada, etc.).
+- Popover (max-h con scroll interno, ancho ~380px, alineado a la derecha, no rompe layout):
+  - Header: título “Notifications” + dos botones pequeños: **Mark all read** y **Clear all**.
+  - Lista ordenada por timestamp desc, agrupada por “Today / Earlier”.
+  - Cada item: icono por tipo, título, body corto, hora relativa, dot azul si unread.
+  - **Hover** sobre item revela dos micro-botones: ✓ marcar leído, ✕ borrar.
+  - Empty state ilustrado.
+- Badge rojo solo cuenta los `unread`.
 
-### 7. Out of scope (per your spec)
-- No social/OAuth providers, no profiles table (auth.users only — confirm if you want a profiles table later), no role system, no email template customization.
+## 4. Tema claro/oscuro y color de acento reales
 
-## Files touched
+Actualmente `:root` y `.dark` definen la misma paleta oscura → el toggle no hace nada.
 
-**Created**
-- `src/integrations/supabase/client.ts` (auto by Cloud)
-- `src/lib/auth/{password,rate-limit,useAuth}.ts`
-- `src/components/auth/{LoginForm,SignUpForm,ResetPasswordForm,PasswordStrengthMeter,ProtectedRoute,Spinner}.tsx`
-- `src/routes/{login,signup,reset-password,_authenticated}.tsx`
+- En `styles.css` añadir una paleta clara real bajo `:root` (mantener la actual bajo `.dark`). Mismos tokens semánticos, recalibrados en oklch para light mode (background claro, foreground oscuro, surfaces, etc.). Gradientes y shadows ajustados.
+- Crear `useThemeStore` (zustand + persist): `theme: "dark" | "light" | "system"` y `accent: hex`. En mount, aplica `document.documentElement.classList.toggle("dark", ...)` y setea `--primary`/`--ring`/`--gradient-primary` derivados del accent.
+- TopBar: el icono Moon/Sun ahora togglea `dark`/`light` y persiste.
+- Settings → Appearance: los botones de Theme y los swatches de Accent se vuelven controlados (`onClick` que llama al store). El swatch activo refleja el estado real, no el índice 0 hardcoded.
+- Verificar contrastes en todas las páginas clave (Sidebar, TopBar, cards, Intelligence terminal).
 
-**Modified**
-- `src/routes/index.tsx` (remove badge; "Get started" CTAs route to `/signup`/`/login`)
-- `src/components/layout/TopBar.tsx` (logout button)
-- All `src/routes/app.*.tsx` → moved under `_authenticated/` (no content edits)
+## 5. Automations — totalmente funcional
 
-**Untouched**
-- All design tokens, charts, mock services, store, every other component.
+Estado actual: ya hay drag-and-drop de la librería y config controlada, pero el usuario reporta que sigue sin servir. Lo que falta:
 
-## Confirm before I build
+- **Crear automatización**: ya existe; añadir prompt de nombre y selector de trigger inicial al crear (modal pequeño). Persistir en zustand (no solo state local) para que sobrevivan navegación.
+- **Editar nodo**: además de Display name / Timeout / Retry, permitir **renombrar** (refleja en el canvas), **eliminar nodo** (botón 🗑 en el panel de config), y **reordenar** (botones ←/→).
+- **Eliminar automatización** y **duplicar** desde menú en cada tab.
+- **Renombrar automatización** inline (doble clic en el tab).
+- **Activar/Pausar** ya funciona; añadir **“Run now”** que inyecta un log nuevo en Execution Logs con estado `running` → `success` tras 1.2s (toast incluido).
+- **Conexiones del canvas**: dejar de calcularse desde índices; usar un grafo simple `{nodes, edges}` por automatización para que reorder/delete actualice las flechas correctamente.
+- **Persistencia**: mover `automations`, `extraNodes`, `statusOverrides`, `nodeConfigs` a `useAutomationsStore` (zustand + persist en localStorage).
+- **Validación visual**: si una automatización no tiene trigger, mostrar warning chip en su tab.
 
-- OK to enable **Lovable Cloud** (managed Supabase)?
-- Keep email confirmation **ON** (recommended) or turn it **OFF** for faster demo testing?
-- Skip a `profiles` table for now (auth.users only)?
+## Archivos a tocar
+
+- `src/lib/auth/useAuth.ts` (mock), `src/components/auth/LoginForm.tsx`, `SignUpForm.tsx`, `ResetPasswordForm.tsx`, `ProtectedRoute.tsx`
+- `src/store/index.ts` (+ nuevos slices: theme, notifications, automations) o nuevos archivos en `src/store/`
+- `src/styles.css` (paleta light + tokens dinámicos de accent)
+- `src/routes/index.tsx` (Watch demo → modal, CTA → login)
+- `src/components/landing/DemoModal.tsx` (nuevo)
+- `src/components/layout/TopBar.tsx` (Bell popover, theme toggle real, avatar)
+- `src/components/notifications/NotificationsPanel.tsx` (nuevo)
+- `src/routes/app.settings.tsx` (Appearance controlado)
+- `src/routes/app.automations.tsx` (CRUD completo, persistencia)
+- `src/routes/app.overview.tsx` (banner onboarding 4 quick-actions)
+- `src/routes/app.tsx` (`beforeLoad` guard mock)
+
+## Detalle técnico
+
+- Auth: cero llamadas a Supabase en este flujo. El cliente Supabase queda solo para edge function de chat (Gemini), no toca auth.
+- Tokens dinámicos: el accent override se hace inyectando un `<style>` en `<head>` con `:root { --primary: ... }` calculado vía oklch a partir del hex elegido (helper `hexToOklch`).
+- Notificaciones popover: usar `@/components/ui/popover` ya disponible en shadcn; max-height con scroll interno, animación fade+scale.
+- Demo modal: framer-motion `AnimatePresence`, autoplay con `useEffect`+`setTimeout`, pausable.
+- Automations grafo: tipo `{ id, label, icon, type }` para nodos y `{from, to}` para edges; el SVG itera edges en lugar de pares consecutivos.
+
+No se introducen migraciones de base de datos ni nuevas dependencias.
