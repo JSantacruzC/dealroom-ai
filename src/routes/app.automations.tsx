@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { automations, executionLogs } from "@/services/mock/analytics";
-import { useState } from "react";
+import { automations as seedAutomations, executionLogs } from "@/services/mock/analytics";
+import { useMemo, useState } from "react";
+import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Play, Pause, Plus, Zap, Database, Brain, MessageSquare, Mic, Webhook, Clock, GitBranch, Filter, Sparkles, X } from "lucide-react";
@@ -22,19 +23,70 @@ const NODE_LIBRARY = [
 type CanvasNode = { id: string; x: number; y: number; label: string; icon: string; type: string };
 
 function AutomationsPage() {
-  const [selectedAutomation, setSelectedAutomation] = useState(automations[0].id);
-  const current = automations.find((a) => a.id === selectedAutomation)!;
+  type AutomationT = (typeof seedAutomations)[number];
+  const [automations, setAutomations] = useState<AutomationT[]>(seedAutomations);
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, "active" | "paused">>({});
+  const [extraNodes, setExtraNodes] = useState<Record<string, { label: string; icon: string }[]>>({});
+  const [selectedAutomation, setSelectedAutomation] = useState(seedAutomations[0].id);
+  const baseCurrent = automations.find((a) => a.id === selectedAutomation)!;
+  const current = {
+    ...baseCurrent,
+    status: statusOverrides[baseCurrent.id] ?? baseCurrent.status,
+    nodes: [...baseCurrent.nodes, ...(extraNodes[baseCurrent.id] ?? [])],
+  };
   const [selectedNode, setSelectedNode] = useState<CanvasNode | null>(null);
+  const [nodeConfigs, setNodeConfigs] = useState<Record<string, { name: string; timeout: number; retry: string; continueOnError: boolean; logPayload: boolean }>>({});
 
   // Build canvas nodes from automation
-  const canvasNodes: CanvasNode[] = current.nodes.map((n, i) => ({
+  const canvasNodes: CanvasNode[] = useMemo(() => current.nodes.map((n, i) => ({
     id: `${current.id}-n${i}`,
     x: 60 + i * 170,
     y: 80 + (i % 2) * 40,
     label: n.label,
     icon: n.icon,
     type: i === 0 ? "trigger" : i === current.nodes.length - 1 ? "action" : i === 3 ? "ai" : "action",
-  }));
+  })), [current.id, current.nodes]);
+
+  const togglePlay = (next: "active" | "paused") => {
+    setStatusOverrides((s) => ({ ...s, [baseCurrent.id]: next }));
+    toast.success(`${baseCurrent.name} ${next === "active" ? "resumed" : "paused"}`);
+  };
+
+  const handleNewAutomation = () => {
+    const id = `auto-${Date.now()}`;
+    const created: AutomationT = {
+      id,
+      name: `Untitled Scenario ${automations.length + 1}`,
+      status: "active",
+      trigger: "manual",
+      runs: 0,
+      nodes: [
+        { label: "Manual trigger", icon: "⚡" },
+        { label: "Slack Post", icon: "💬" },
+      ],
+    } as AutomationT;
+    setAutomations((a) => [...a, created]);
+    setSelectedAutomation(id);
+    setSelectedNode(null);
+    toast.success("New automation created");
+  };
+
+  const handleDropNode = (e: React.DragEvent) => {
+    e.preventDefault();
+    const raw = e.dataTransfer.getData("application/x-node");
+    if (!raw) return;
+    const { label } = JSON.parse(raw) as { label: string };
+    const iconMap: Record<string, string> = { Webhook: "🪝", Schedule: "⏰", "Clay Enrich": "🧪", "ICP Filter": "🎯", "Gemini Reason": "🧠", "Generate Copy": "✨", "Slack Post": "💬", "ElevenLabs TTS": "🎙️", Branch: "🔀" };
+    setExtraNodes((m) => ({ ...m, [baseCurrent.id]: [...(m[baseCurrent.id] ?? []), { label, icon: iconMap[label] ?? "▢" }] }));
+    toast.success(`${label} added`);
+  };
+
+  const cfg = selectedNode ? (nodeConfigs[selectedNode.id] ?? { name: selectedNode.label, timeout: 5000, retry: "Exponential (3 attempts)", continueOnError: false, logPayload: true }) : null;
+  const updateCfg = (patch: Partial<NonNullable<typeof cfg>>) => {
+    if (!selectedNode || !cfg) return;
+    setNodeConfigs((m) => ({ ...m, [selectedNode.id]: { ...cfg, ...patch } }));
+  };
+
 
   return (
     <div className="p-6 space-y-6">
@@ -44,7 +96,7 @@ function AutomationsPage() {
           <h1 className="font-display text-3xl mt-1">Automations</h1>
           <p className="text-sm text-muted-foreground mt-1">{automations.filter((a) => a.status === "active").length} active scenarios · {executionLogs.length} runs in last hour</p>
         </div>
-        <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
+        <Button onClick={handleNewAutomation} className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
           <Plus className="w-4 h-4 mr-1" />New Automation
         </Button>
       </div>
@@ -77,6 +129,8 @@ function AutomationsPage() {
                 key={n.label}
                 className="border border-border rounded p-2 bg-surface/40 cursor-grab hover:border-primary/40 hover:bg-surface/70 transition-all flex items-center gap-2 text-xs"
                 draggable
+                onDragStart={(e) => e.dataTransfer.setData("application/x-node", JSON.stringify({ label: n.label }))}
+                onClick={() => { setExtraNodes((m) => ({ ...m, [baseCurrent.id]: [...(m[baseCurrent.id] ?? []), { label: n.label, icon: ({ Webhook: "🪝", Schedule: "⏰", "Clay Enrich": "🧪", "ICP Filter": "🎯", "Gemini Reason": "🧠", "Generate Copy": "✨", "Slack Post": "💬", "ElevenLabs TTS": "🎙️", Branch: "🔀" } as Record<string,string>)[n.label] ?? "▢" }] })); toast.success(`${n.label} added`); }}
               >
                 <Icon className={`w-3.5 h-3.5 ${n.color === "primary" ? "text-primary" : n.color === "accent" ? "text-accent" : n.color === "success" ? "text-[oklch(0.75_0.15_165)]" : "text-warning"}`} />
                 <span className="truncate">{n.label}</span>
@@ -86,7 +140,7 @@ function AutomationsPage() {
         </aside>
 
         {/* Canvas */}
-        <div className="col-span-7 border-hairline rounded-lg bg-card relative overflow-hidden">
+        <div className="col-span-7 border-hairline rounded-lg bg-card relative overflow-hidden" onDragOver={(e) => e.preventDefault()} onDrop={handleDropNode}>
           <div className="absolute inset-0 bg-dots opacity-40" />
           {/* Canvas toolbar */}
           <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 py-2 border-b border-border bg-card/80 backdrop-blur z-10">
@@ -97,8 +151,8 @@ function AutomationsPage() {
               <span className="text-[10px] font-mono text-muted-foreground">trigger: {current.trigger}</span>
             </div>
             <div className="flex items-center gap-2">
-              <button className="text-xs text-muted-foreground hover:text-foreground p-1"><Pause className="w-3.5 h-3.5" /></button>
-              <button className="text-xs text-primary hover:text-primary/80 p-1"><Play className="w-3.5 h-3.5" /></button>
+              <button onClick={() => togglePlay("paused")} disabled={current.status === "paused"} className="text-xs text-muted-foreground hover:text-foreground p-1 disabled:opacity-40"><Pause className="w-3.5 h-3.5" /></button>
+              <button onClick={() => togglePlay("active")} disabled={current.status === "active"} className="text-xs text-primary hover:text-primary/80 p-1 disabled:opacity-40"><Play className="w-3.5 h-3.5" /></button>
             </div>
           </div>
 
@@ -165,18 +219,18 @@ function AutomationsPage() {
               </div>
               <div className="font-display text-base flex items-center gap-2">{selectedNode.icon} {selectedNode.label}</div>
               <div className="border-t border-border -mx-4" />
-              <div className="space-y-3 text-xs">
+              <div key={selectedNode.id} className="space-y-3 text-xs">
                 <div>
                   <div className="font-mono uppercase text-[10px] text-muted-foreground mb-1">Display name</div>
-                  <input defaultValue={selectedNode.label} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm" />
+                  <input value={cfg!.name} onChange={(e) => updateCfg({ name: e.target.value })} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm" />
                 </div>
                 <div>
                   <div className="font-mono uppercase text-[10px] text-muted-foreground mb-1">Timeout (ms)</div>
-                  <input type="number" defaultValue={5000} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm font-mono" />
+                  <input type="number" value={cfg!.timeout} onChange={(e) => updateCfg({ timeout: Number(e.target.value) })} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm font-mono" />
                 </div>
                 <div>
                   <div className="font-mono uppercase text-[10px] text-muted-foreground mb-1">Retry policy</div>
-                  <select className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm">
+                  <select value={cfg!.retry} onChange={(e) => updateCfg({ retry: e.target.value })} className="w-full bg-surface border border-border rounded px-2 py-1.5 text-sm">
                     <option>Exponential (3 attempts)</option>
                     <option>Linear (5 attempts)</option>
                     <option>None</option>
@@ -184,11 +238,11 @@ function AutomationsPage() {
                 </div>
                 <div className="flex items-center justify-between pt-2 border-t border-border">
                   <span className="text-muted-foreground">Continue on error</span>
-                  <Switch />
+                  <Switch checked={cfg!.continueOnError} onCheckedChange={(v) => updateCfg({ continueOnError: v })} />
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-muted-foreground">Log payload</span>
-                  <Switch defaultChecked />
+                  <Switch checked={cfg!.logPayload} onCheckedChange={(v) => updateCfg({ logPayload: v })} />
                 </div>
               </div>
               <div className="border-t border-border -mx-4 pt-3 mt-3 px-4">
