@@ -140,7 +140,7 @@ function AutomationsPage() {
         </aside>
 
         {/* Canvas */}
-        <div className="col-span-7 border-hairline rounded-lg bg-card relative overflow-hidden">
+        <div className="col-span-7 border-hairline rounded-lg bg-card relative overflow-hidden" onDragOver={(e) => e.preventDefault()} onDrop={handleDropNode}>
           <div className="absolute inset-0 bg-dots opacity-40" />
           {/* Canvas toolbar */}
           <div className="absolute top-0 inset-x-0 flex items-center justify-between px-4 py-2 border-b border-border bg-card/80 backdrop-blur z-10">
