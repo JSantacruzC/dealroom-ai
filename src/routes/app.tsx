@@ -2,10 +2,15 @@ import { createFileRoute, Outlet, useRouterState } from "@tanstack/react-router"
 import { Sidebar } from "@/components/layout/Sidebar";
 import { TopBar } from "@/components/layout/TopBar";
 import { CommandPalette } from "@/components/layout/CommandPalette";
+import { ProtectedRoute } from "@/components/auth/ProtectedRoute";
 import { motion, AnimatePresence } from "framer-motion";
 
 export const Route = createFileRoute("/app")({
-  component: AppShell,
+  component: () => (
+    <ProtectedRoute>
+      <AppShell />
+    </ProtectedRoute>
+  ),
 });
 
 function AppShell() {
