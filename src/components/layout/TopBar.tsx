@@ -1,24 +1,16 @@
-import { Bell, Search, Plus, Moon, LogOut } from "lucide-react";
+import { Bell, Search, Plus, Moon } from "lucide-react";
 import { useUIStore } from "@/store";
 import { NewDealRoomModal } from "@/components/dealrooms/NewDealRoomModal";
 import { useState, useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router";
-import { supabase } from "@/integrations/supabase/client";
 
 export function TopBar() {
   const { setCommandOpen, notifications, resetNotifications, bumpNotification } = useUIStore();
   const [open, setOpen] = useState(false);
-  const navigate = useNavigate();
 
   useEffect(() => {
     const t = setInterval(bumpNotification, 30000);
     return () => clearInterval(t);
   }, [bumpNotification]);
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    navigate({ to: "/login" });
-  }
 
   return (
     <>
