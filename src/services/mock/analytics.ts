@@ -126,13 +126,14 @@ export const touchpoints: Touchpoint[] = [
 ];
 
 export const integrations: Integration[] = [
-  { id: "slack", name: "Slack", description: "Primary interface for DealRoom channels", status: "connected", connectedAs: "dealroom-co.slack.com", apiKey: "xoxb-************************", lastSync: "2 min ago" },
-  { id: "clay", name: "Clay", description: "Account enrichment and stakeholder discovery", status: "connected", connectedAs: "workspace: dealroom", apiKey: "clay_************************", lastSync: "12 min ago", usage: { label: "Enrichment credits", current: 47, max: 100, unit: "credits" } },
-  { id: "anthropic", name: "Anthropic", description: "Deal Captain AI orchestration", status: "connected", connectedAs: "claude-sonnet-4-5", apiKey: "sk-ant-************************", lastSync: "Just now", usage: { label: "API spend this month", current: 2.31, max: 5.0, unit: "$" } },
+  { id: "slack", name: "Slack", description: "Primary interface for DealRoom channels and team coordination", status: "connected", connectedAs: "dealroom-co.slack.com", apiKey: "xoxb-************************", lastSync: "2 min ago" },
+  { id: "gemini", name: "Gemini", description: "Deal Captain AI orchestration & reasoning", status: "connected", connectedAs: "gemini-3-flash-preview", apiKey: "AIza-************************", lastSync: "Just now", usage: { label: "API spend this month", current: 2.31, max: 5.0, unit: "$" } },
   { id: "supabase", name: "Supabase", description: "Deal state, touchpoints, intelligence storage", status: "connected", connectedAs: "project: dealroom-prod", apiKey: "sb_************************", lastSync: "Just now" },
+  { id: "make", name: "Make.com", description: "Visual workflow orchestration & event routing", status: "connected", connectedAs: "team: dealroom-ops", apiKey: "mk_************************", lastSync: "5 min ago", usage: { label: "Operations used", current: 1240, max: 10000, unit: "ops" } },
+  { id: "clay", name: "Clay", description: "Account enrichment and stakeholder discovery", status: "connected", connectedAs: "workspace: dealroom", apiKey: "clay_************************", lastSync: "12 min ago", usage: { label: "Enrichment credits", current: 47, max: 100, unit: "credits" } },
+  { id: "apollo", name: "Apollo.io", description: "Supplementary prospecting data & contact graph", status: "connected", connectedAs: "team@dealroom.co", apiKey: "apl_************************", lastSync: "1 hour ago" },
   { id: "elevenlabs", name: "ElevenLabs", description: "AI voicemail generation", status: "pending", usage: { label: "TTS minutes used", current: 0, max: 10, unit: "min" } },
-  { id: "miro", name: "Miro", description: "Org map visualization", status: "pending" },
-  { id: "apollo", name: "Apollo.io", description: "Supplementary prospecting data", status: "disconnected" },
+  { id: "miro", name: "Miro", description: "Org map & buying-committee visualization", status: "pending" },
 ];
 
 export const automations: Automation[] = [
