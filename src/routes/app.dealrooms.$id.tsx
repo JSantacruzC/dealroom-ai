@@ -5,10 +5,10 @@ import { DealStatusBadge, RoleBadge, StakeholderStatusBadge, InfluenceDots } fro
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { cannedResponses, fallbackResponse } from "@/services/mock/analytics";
 import { toast } from "sonner";
-import { Send, Mic, Phone, Check, SkipForward, Bot, Loader2 } from "lucide-react";
-import type { ChatMessage, Stakeholder } from "@/types";
+import { Mic, Phone, Check, SkipForward, Bot } from "lucide-react";
+import type { Stakeholder } from "@/types";
+import { DealCaptainChat } from "@/components/dealrooms/DealCaptainChat";
 
 export const Route = createFileRoute("/app/dealrooms/$id")({
   component: DealRoomDetail,
@@ -188,73 +188,6 @@ function StakeholderCard({ s }: { s: Stakeholder }) {
 }
 
 function DealCaptainPanel({ companyName }: { companyName: string }) {
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    { id: "u0", role: "user", content: "What's my next move?", timestamp: "1m ago" },
-    { id: "a0", role: "assistant", content: cannedResponses[0].content, timestamp: "1m ago" },
-  ]);
-  const [input, setInput] = useState("");
-  const [thinking, setThinking] = useState(false);
-
-  const send = (q?: string) => {
-    const text = (q ?? input).trim();
-    if (!text) return;
-    setMessages((m) => [...m, { id: `u${Date.now()}`, role: "user", content: text, timestamp: "now" }]);
-    setInput("");
-    setThinking(true);
-    setTimeout(() => {
-      const match = cannedResponses.find((c) => c.match.test(text));
-      setMessages((m) => [...m, { id: `a${Date.now()}`, role: "assistant", content: match?.content ?? fallbackResponse, timestamp: "now" }]);
-      setThinking(false);
-    }, 1500);
-  };
-
-  return (
-    <aside className="w-[320px] shrink-0 border-l border-border bg-surface/40 flex flex-col">
-      <div className="px-4 py-3 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="font-display text-sm">Deal Captain</div>
-          <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-white/5 border border-border">claude-sonnet-4-5</span>
-          <span className="ml-auto w-2 h-2 rounded-full bg-success animate-pulse" />
-        </div>
-        <div className="text-[10px] font-mono uppercase text-muted-foreground tracking-wider mt-1">{companyName}</div>
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-4 space-y-3">
-        {messages.map((m) => (
-          <div key={m.id} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
-            <div className={`max-w-[90%] rounded-lg px-3 py-2 text-sm whitespace-pre-wrap ${m.role === "user" ? "bg-primary/20 border border-primary/30" : "bg-card border border-border"}`}>
-              {m.content.split("\n").map((line, i) => <div key={i}>{line || "\u00A0"}</div>)}
-            </div>
-          </div>
-        ))}
-        {thinking && (
-          <div className="flex items-center gap-1.5 text-muted-foreground">
-            <Loader2 className="w-3 h-3 animate-spin" />
-            <span className="w-1.5 h-1.5 rounded-full bg-primary typing-dot" />
-            <span className="w-1.5 h-1.5 rounded-full bg-primary typing-dot" style={{ animationDelay: "0.15s" }} />
-            <span className="w-1.5 h-1.5 rounded-full bg-primary typing-dot" style={{ animationDelay: "0.3s" }} />
-          </div>
-        )}
-      </div>
-
-      <div className="p-3 border-t border-border space-y-2">
-        <div className="flex flex-wrap gap-1.5">
-          {["What's my next move?", "Run risk check", "Generate debrief", "Refresh intelligence", "Write voicemail for Sarah"].map((p) => (
-            <button key={p} onClick={() => send(p)} className="text-[10px] px-2 py-1 rounded-full border border-border bg-card hover:border-primary/30 text-muted-foreground hover:text-foreground">{p}</button>
-          ))}
-        </div>
-        <div className="flex gap-2">
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && send()}
-            placeholder="Ask Deal Captain…"
-            className="flex-1 px-3 py-2 rounded-md bg-surface border border-border text-sm focus:outline-none focus:border-primary/40"
-          />
-          <Button size="sm" onClick={() => send()} style={{ background: "var(--gradient-primary)" }}><Send className="w-3 h-3" /></Button>
-        </div>
-        <div className="text-[10px] font-mono text-muted-foreground text-center">Powered by Claude claude-sonnet-4-5</div>
-      </div>
-    </aside>
-  );
+  return <DealCaptainChat companyName={companyName} />;
 }
+

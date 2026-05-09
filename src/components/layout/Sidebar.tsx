@@ -1,5 +1,5 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import { Home, Zap, Users, Brain, Activity, BarChart3, Workflow, Plug, UserCog, Settings, ChevronLeft } from "lucide-react";
+import { Home, Zap, Users, Brain, Activity, BarChart3, Workflow, Plug, UserCog, Settings, ChevronLeft, UsersRound } from "lucide-react";
 import { useUIStore } from "@/store";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ const items = [
   { to: "/app/analytics", label: "Analytics", icon: BarChart3 },
   { to: "/app/automations", label: "Automations", icon: Workflow },
   { to: "/app/integrations", label: "Integrations", icon: Plug },
+  { to: "/app/team", label: "Team", icon: UsersRound },
   { to: "/app/settings", label: "Settings", icon: Settings },
 ] as const;
 

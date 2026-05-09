@@ -76,7 +76,7 @@ export function NewDealRoomModal({ open, onOpenChange }: { open: boolean; onOpen
               <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Company name</label>
               <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Datadog" className="mt-2 bg-surface border-border" autoFocus />
             </div>
-            <p className="text-xs text-muted-foreground">Clay will enrich firmographics, Claude will generate the playbook, and a Slack war room will be created.</p>
+            <p className="text-xs text-muted-foreground">Clay will enrich firmographics, Gemini will generate the playbook, and a Slack war room will be created.</p>
             <Button onClick={start} className="w-full" style={{ background: "var(--gradient-primary)" }}>Launch</Button>
           </div>
         ) : (

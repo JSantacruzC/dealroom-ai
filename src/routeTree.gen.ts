@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppTouchpointsRouteImport } from './routes/app.touchpoints'
+import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppStakeholdersRouteImport } from './routes/app.stakeholders'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppOverviewRouteImport } from './routes/app.overview'
@@ -23,6 +24,7 @@ import { Route as AppIntegrationsRouteImport } from './routes/app.integrations'
 import { Route as AppDealroomsRouteImport } from './routes/app.dealrooms'
 import { Route as AppAutomationsRouteImport } from './routes/app.automations'
 import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as AppDealroomsIdRouteImport } from './routes/app.dealrooms.$id'
 
 const SignupRoute = SignupRouteImport.update({
@@ -53,6 +55,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppTouchpointsRoute = AppTouchpointsRouteImport.update({
   id: '/touchpoints',
   path: '/touchpoints',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
   getParentRoute: () => AppRoute,
 } as any)
 const AppStakeholdersRoute = AppStakeholdersRouteImport.update({
@@ -95,6 +102,11 @@ const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
   path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppDealroomsIdRoute = AppDealroomsIdRouteImport.update({
   id: '/$id',
   path: '/$id',
@@ -107,6 +119,7 @@ export interface FileRoutesByFullPath {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
@@ -115,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/app/overview': typeof AppOverviewRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
@@ -124,6 +138,7 @@ export interface FileRoutesByTo {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
@@ -132,6 +147,7 @@ export interface FileRoutesByTo {
   '/app/overview': typeof AppOverviewRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
@@ -142,6 +158,7 @@ export interface FileRoutesById {
   '/login': typeof LoginRoute
   '/reset-password': typeof ResetPasswordRoute
   '/signup': typeof SignupRoute
+  '/api/chat': typeof ApiChatRoute
   '/app/analytics': typeof AppAnalyticsRoute
   '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
@@ -150,6 +167,7 @@ export interface FileRoutesById {
   '/app/overview': typeof AppOverviewRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
@@ -161,6 +179,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/api/chat'
     | '/app/analytics'
     | '/app/automations'
     | '/app/dealrooms'
@@ -169,6 +188,7 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/settings'
     | '/app/stakeholders'
+    | '/app/team'
     | '/app/touchpoints'
     | '/app/dealrooms/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -178,6 +198,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/api/chat'
     | '/app/analytics'
     | '/app/automations'
     | '/app/dealrooms'
@@ -186,6 +207,7 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/settings'
     | '/app/stakeholders'
+    | '/app/team'
     | '/app/touchpoints'
     | '/app/dealrooms/$id'
   id:
@@ -195,6 +217,7 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/signup'
+    | '/api/chat'
     | '/app/analytics'
     | '/app/automations'
     | '/app/dealrooms'
@@ -203,6 +226,7 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/settings'
     | '/app/stakeholders'
+    | '/app/team'
     | '/app/touchpoints'
     | '/app/dealrooms/$id'
   fileRoutesById: FileRoutesById
@@ -213,6 +237,7 @@ export interface RootRouteChildren {
   LoginRoute: typeof LoginRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
+  ApiChatRoute: typeof ApiChatRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -257,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/touchpoints'
       fullPath: '/app/touchpoints'
       preLoaderRoute: typeof AppTouchpointsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/team': {
+      id: '/app/team'
+      path: '/team'
+      fullPath: '/app/team'
+      preLoaderRoute: typeof AppTeamRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/stakeholders': {
@@ -315,6 +347,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/dealrooms/$id': {
       id: '/app/dealrooms/$id'
       path: '/$id'
@@ -346,6 +385,7 @@ interface AppRouteChildren {
   AppOverviewRoute: typeof AppOverviewRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppStakeholdersRoute: typeof AppStakeholdersRoute
+  AppTeamRoute: typeof AppTeamRoute
   AppTouchpointsRoute: typeof AppTouchpointsRoute
 }
 
@@ -358,6 +398,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppOverviewRoute: AppOverviewRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppStakeholdersRoute: AppStakeholdersRoute,
+  AppTeamRoute: AppTeamRoute,
   AppTouchpointsRoute: AppTouchpointsRoute,
 }
 
@@ -369,17 +410,8 @@ const rootRouteChildren: RootRouteChildren = {
   LoginRoute: LoginRoute,
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
+  ApiChatRoute: ApiChatRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
