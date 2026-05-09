@@ -238,6 +238,8 @@ function Landing() {
           <div>© 2026</div>
         </div>
       </footer>
+
+      <DemoModal open={demoOpen} onOpenChange={setDemoOpen} />
     </div>
   );
 }
