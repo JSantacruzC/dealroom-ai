@@ -96,7 +96,7 @@ function AutomationsPage() {
           <h1 className="font-display text-3xl mt-1">Automations</h1>
           <p className="text-sm text-muted-foreground mt-1">{automations.filter((a) => a.status === "active").length} active scenarios · {executionLogs.length} runs in last hour</p>
         </div>
-        <Button className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
+        <Button onClick={handleNewAutomation} className="bg-gradient-to-r from-primary to-accent text-primary-foreground">
           <Plus className="w-4 h-4 mr-1" />New Automation
         </Button>
       </div>
