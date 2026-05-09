@@ -61,7 +61,7 @@ function Landing() {
 
           <div className="mt-16 text-xs font-mono uppercase tracking-wider text-muted-foreground">Powered by</div>
           <div className="mt-3 flex flex-wrap justify-center gap-x-8 gap-y-3 text-sm text-muted-foreground/70">
-            {["Slack", "Clay", "Anthropic", "Supabase", "ElevenLabs", "Miro"].map((n) => (
+            {["Slack", "Clay", "Gemini", "Supabase", "ElevenLabs", "Miro"].map((n) => (
               <span key={n} className="font-mono">{n}</span>
             ))}
           </div>
@@ -90,7 +90,7 @@ function Landing() {
           <div className="grid md:grid-cols-3 gap-4">
             {[
               { i: Zap, t: "Instant War Rooms", d: "From ICP signal to full DealRoom in 30 seconds." },
-              { i: Brain, t: "AI Deal Captain", d: "Claude coordinates your team, not just your sequences." },
+              { i: Brain, t: "AI Deal Captain", d: "Gemini coordinates your team, not just your sequences." },
               { i: Users, t: "Stakeholder Mapping", d: "Know who has budget, who blocks, who champions." },
               { i: Mic, t: "AI Voicemails", d: "One click, personalized audio for every contact." },
               { i: Link2, t: "Zero Friction", d: "Lives inside Slack. No new tool to adopt." },
@@ -117,7 +117,7 @@ function Landing() {
             {[
               { n: "01", t: "Trigger", d: "ICP score crosses threshold", i: "🎯" },
               { n: "02", t: "Enrich", d: "Clay maps the full buying committee", i: "🧪" },
-              { n: "03", t: "Orchestrate", d: "Claude generates the complete attack plan", i: "🧠" },
+              { n: "03", t: "Orchestrate", d: "Gemini generates the complete attack plan", i: "🧠" },
               { n: "04", t: "Execute", d: "SDR fires from inside Slack", i: "⚡" },
               { n: "05", t: "Learn", d: "Every outcome trains the model", i: "📈" },
             ].map((s) => (
@@ -156,7 +156,7 @@ function Landing() {
             <h2 className="font-display text-4xl md:text-5xl">Plays well with your stack</h2>
           </div>
           <div className="grid md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {["Slack","Clay","Anthropic","Supabase","ElevenLabs","Miro","Apollo","HubSpot"].map((n) => (
+            {["Slack","Clay","Gemini","Supabase","ElevenLabs","Miro","Apollo","HubSpot"].map((n) => (
               <div key={n} className="border-hairline rounded-lg p-5 bg-card flex items-center gap-3">
                 <div className="w-9 h-9 rounded-md bg-white/5 border border-border flex items-center justify-center font-display">
                   {n[0]}
@@ -183,7 +183,7 @@ function Landing() {
           <div className="grid md:grid-cols-3 gap-4">
             {[
               { q: "We used to spend 6 hours mapping a single account. DealRoom does it in 23 seconds.", n: "Sarah Liu", t: "VP Sales", c: "Atlas Robotics" },
-              { q: "Claude as a deal captain isn't gimmick — it's how we hit Q3 number with half the SDRs.", n: "Marcus Chen", t: "CRO", c: "Northwind Cloud" },
+              { q: "Gemini as a deal captain isn't gimmick — it's how we hit Q3 number with half the SDRs.", n: "Marcus Chen", t: "CRO", c: "Northwind Cloud" },
               { q: "Reply rates went from 18% to 41%. The threading plan alone is worth the contract.", n: "Priya Reddy", t: "Head of GTM", c: "Tessera Labs" },
             ].map((t) => (
               <div key={t.n} className="border-hairline rounded-lg p-6 bg-card">
@@ -247,7 +247,7 @@ function FloatingPreview() {
           <div className="flex items-start gap-3">
             <div className="w-7 h-7 rounded-full bg-gradient-to-br from-primary to-accent shrink-0" />
             <div className="flex-1">
-              <div className="text-xs"><span className="font-medium">Deal Captain</span> <span className="text-muted-foreground font-mono">claude-sonnet-4-5</span></div>
+              <div className="text-xs"><span className="font-medium">Deal Captain</span> <span className="text-muted-foreground font-mono">gemini-3-flash-preview</span></div>
               <div className="mt-1 text-sm text-foreground">Stripe DealRoom is live. 6 stakeholders mapped. Champion identified: Priya Nair.</div>
             </div>
           </div>
