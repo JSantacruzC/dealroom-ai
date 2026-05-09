@@ -23,19 +23,70 @@ const NODE_LIBRARY = [
 type CanvasNode = { id: string; x: number; y: number; label: string; icon: string; type: string };
 
 function AutomationsPage() {
-  const [selectedAutomation, setSelectedAutomation] = useState(automations[0].id);
-  const current = automations.find((a) => a.id === selectedAutomation)!;
+  type AutomationT = (typeof seedAutomations)[number];
+  const [automations, setAutomations] = useState<AutomationT[]>(seedAutomations);
+  const [statusOverrides, setStatusOverrides] = useState<Record<string, "active" | "paused">>({});
+  const [extraNodes, setExtraNodes] = useState<Record<string, { label: string; icon: string }[]>>({});
+  const [selectedAutomation, setSelectedAutomation] = useState(seedAutomations[0].id);
+  const baseCurrent = automations.find((a) => a.id === selectedAutomation)!;
+  const current = {
+    ...baseCurrent,
+    status: statusOverrides[baseCurrent.id] ?? baseCurrent.status,
+    nodes: [...baseCurrent.nodes, ...(extraNodes[baseCurrent.id] ?? [])],
+  };
   const [selectedNode, setSelectedNode] = useState<CanvasNode | null>(null);
+  const [nodeConfigs, setNodeConfigs] = useState<Record<string, { name: string; timeout: number; retry: string; continueOnError: boolean; logPayload: boolean }>>({});
 
   // Build canvas nodes from automation
-  const canvasNodes: CanvasNode[] = current.nodes.map((n, i) => ({
+  const canvasNodes: CanvasNode[] = useMemo(() => current.nodes.map((n, i) => ({
     id: `${current.id}-n${i}`,
     x: 60 + i * 170,
     y: 80 + (i % 2) * 40,
     label: n.label,
     icon: n.icon,
     type: i === 0 ? "trigger" : i === current.nodes.length - 1 ? "action" : i === 3 ? "ai" : "action",
-  }));
+  })), [current.id, current.nodes]);
+
+  const togglePlay = (next: "active" | "paused") => {
+    setStatusOverrides((s) => ({ ...s, [baseCurrent.id]: next }));
+    toast.success(`${baseCurrent.name} ${next === "active" ? "resumed" : "paused"}`);
+  };
+
+  const handleNewAutomation = () => {
+    const id = `auto-${Date.now()}`;
+    const created: AutomationT = {
+      id,
+      name: `Untitled Scenario ${automations.length + 1}`,
+      status: "active",
+      trigger: "manual",
+      runs: 0,
+      nodes: [
+        { label: "Manual trigger", icon: "⚡" },
+        { label: "Slack Post", icon: "💬" },
+      ],
+    } as AutomationT;
+    setAutomations((a) => [...a, created]);
+    setSelectedAutomation(id);
+    setSelectedNode(null);
+    toast.success("New automation created");
+  };
+
+  const handleDropNode = (e: React.DragEvent) => {
+    e.preventDefault();
+    const raw = e.dataTransfer.getData("application/x-node");
+    if (!raw) return;
+    const { label } = JSON.parse(raw) as { label: string };
+    const iconMap: Record<string, string> = { Webhook: "🪝", Schedule: "⏰", "Clay Enrich": "🧪", "ICP Filter": "🎯", "Gemini Reason": "🧠", "Generate Copy": "✨", "Slack Post": "💬", "ElevenLabs TTS": "🎙️", Branch: "🔀" };
+    setExtraNodes((m) => ({ ...m, [baseCurrent.id]: [...(m[baseCurrent.id] ?? []), { label, icon: iconMap[label] ?? "▢" }] }));
+    toast.success(`${label} added`);
+  };
+
+  const cfg = selectedNode ? (nodeConfigs[selectedNode.id] ?? { name: selectedNode.label, timeout: 5000, retry: "Exponential (3 attempts)", continueOnError: false, logPayload: true }) : null;
+  const updateCfg = (patch: Partial<NonNullable<typeof cfg>>) => {
+    if (!selectedNode || !cfg) return;
+    setNodeConfigs((m) => ({ ...m, [selectedNode.id]: { ...cfg, ...patch } }));
+  };
+
 
   return (
     <div className="p-6 space-y-6">
