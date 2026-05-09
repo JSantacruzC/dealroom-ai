@@ -1,22 +1,21 @@
 import { useState } from "react";
 import { Link, useNavigate, useSearch } from "@tanstack/react-router";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 import { sanitize } from "@/lib/auth/password";
-import { getCooldownSeconds, recordFailure, recordSuccess } from "@/lib/auth/rate-limit";
+import { useAuthStore } from "@/store/auth";
 import { AuthShell, inputClass, primaryButtonClass, primaryButtonStyle } from "./AuthShell";
 import { Spinner } from "./Spinner";
 
 export function LoginForm() {
   const navigate = useNavigate();
   const search = useSearch({ strict: false }) as { redirect?: string };
+  const signIn = useAuthStore((s) => s.signIn);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [emailErr, setEmailErr] = useState("");
   const [passErr, setPassErr] = useState("");
   const [formErr, setFormErr] = useState("");
   const [loading, setLoading] = useState(false);
-  const [resetLoading, setResetLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -25,45 +24,23 @@ export function LoginForm() {
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
       setEmailErr("Enter a valid email address."); return;
     }
-    if (!password) { setPassErr("Password is required."); return; }
-    const cooldown = getCooldownSeconds(cleanEmail);
-    if (cooldown > 0) {
-      setFormErr(`Too many attempts. Try again in ${cooldown} seconds.`); return;
-    }
+    if (!password || password.length < 4) { setPassErr("Password is required."); return; }
     setLoading(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
-      if (error) {
-        const wait = recordFailure(cleanEmail);
-        setFormErr(wait > 0
-          ? `Too many attempts. Try again in ${wait} seconds.`
-          : "Invalid credentials. Please try again.");
-        return;
-      }
-      recordSuccess(cleanEmail);
-      navigate({ to: search.redirect ?? "/app/overview" });
+      await signIn(cleanEmail, password);
+      toast.success("Welcome back");
+      const dest = search.redirect && search.redirect.startsWith("/") ? search.redirect : "/app/overview";
+      navigate({ to: dest });
     } catch {
-      setFormErr("Something went wrong. Please try again.");
+      setFormErr("Could not sign in. Please try again.");
     } finally {
       setLoading(false);
     }
   }
 
-  async function onForgot() {
-    const cleanEmail = sanitize(email);
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
-      setEmailErr("Enter your email above first."); return;
-    }
-    setResetLoading(true);
-    try {
-      const { error } = await supabase.auth.resetPasswordForEmail(cleanEmail, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
-      if (error) toast.error("Could not send reset email. Please try again.");
-      else toast.success("Password reset email sent. Check your inbox.");
-    } finally {
-      setResetLoading(false);
-    }
+  function fillDemo() {
+    setEmail("demo@dealroom.app");
+    setPassword("demo1234");
   }
 
   return (
@@ -81,8 +58,8 @@ export function LoginForm() {
         <div>
           <div className="flex items-center justify-between mb-1.5">
             <label htmlFor="password" className="block text-xs font-mono uppercase tracking-wider text-muted-foreground">Password</label>
-            <button type="button" onClick={onForgot} disabled={resetLoading} className="text-xs text-primary hover:underline disabled:opacity-50">
-              {resetLoading ? "Sending…" : "Forgot password?"}
+            <button type="button" onClick={fillDemo} className="text-xs text-primary hover:underline">
+              Use demo credentials
             </button>
           </div>
           <input id="password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} className={inputClass} placeholder="••••••••" />
@@ -94,6 +71,9 @@ export function LoginForm() {
         <button type="submit" disabled={loading} className={primaryButtonClass} style={primaryButtonStyle}>
           {loading ? <Spinner /> : null} Sign in
         </button>
+        <p className="text-[11px] text-muted-foreground text-center">
+          Mock auth — any valid email + password (4+ chars) signs you in.
+        </p>
       </form>
     </AuthShell>
   );

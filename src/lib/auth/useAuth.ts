@@ -1,26 +1,11 @@
-import { useEffect, useState } from "react";
-import type { Session, User } from "@supabase/supabase-js";
-import { supabase } from "@/integrations/supabase/client";
+import { useAuthStore } from "@/store/auth";
 
 export function useAuth() {
-  const [session, setSession] = useState<Session | null>(null);
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // 1. listener BEFORE getSession
-    const { data: sub } = supabase.auth.onAuthStateChange((_event, s) => {
-      setSession(s);
-      setUser(s?.user ?? null);
-    });
-    // 2. then hydrate
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session);
-      setUser(data.session?.user ?? null);
-      setLoading(false);
-    });
-    return () => sub.subscription.unsubscribe();
-  }, []);
-
-  return { session, user, loading };
+  const user = useAuthStore((s) => s.user);
+  const hydrated = useAuthStore((s) => s.hydrated);
+  return {
+    user,
+    session: user ? { user } : null,
+    loading: !hydrated,
+  };
 }

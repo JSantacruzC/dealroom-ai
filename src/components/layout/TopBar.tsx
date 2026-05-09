@@ -1,16 +1,43 @@
-import { Bell, Search, Plus, Moon } from "lucide-react";
+import { Search, Plus, Moon, Sun, LogOut, User as UserIcon, Settings as SettingsIcon } from "lucide-react";
 import { useUIStore } from "@/store";
+import { useNotificationsStore } from "@/store/notifications";
+import { useThemeStore } from "@/store/theme";
+import { useAuthStore } from "@/store/auth";
 import { NewDealRoomModal } from "@/components/dealrooms/NewDealRoomModal";
+import { NotificationsPanel } from "@/components/notifications/NotificationsPanel";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { useNavigate, Link } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 
 export function TopBar() {
-  const { setCommandOpen, notifications, resetNotifications, bumpNotification } = useUIStore();
+  const { setCommandOpen } = useUIStore();
+  const bumpRandom = useNotificationsStore((s) => s.bumpRandom);
+  const theme = useThemeStore((s) => s.theme);
+  const toggleTheme = useThemeStore((s) => s.toggleTheme);
+  const user = useAuthStore((s) => s.user);
+  const signOut = useAuthStore((s) => s.signOut);
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
-    const t = setInterval(bumpNotification, 30000);
+    const t = setInterval(bumpRandom, 45000);
     return () => clearInterval(t);
-  }, [bumpNotification]);
+  }, [bumpRandom]);
+
+  const isDark = theme !== "light";
+  const initials = (user?.name ?? "U")
+    .split(" ")
+    .map((s) => s[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <>
@@ -21,25 +48,61 @@ export function TopBar() {
         >
           <Search className="w-3.5 h-3.5" />
           <span className="flex-1 text-left">Search accounts, contacts, actions…</span>
-          <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-white/5 border border-border font-mono">⌘K</kbd>
+          <kbd className="text-[10px] px-1.5 py-0.5 rounded bg-foreground/5 border border-border font-mono">⌘K</kbd>
         </button>
 
         <div className="flex-1" />
 
+        <NotificationsPanel />
+
         <button
-          onClick={resetNotifications}
-          className="relative w-9 h-9 flex items-center justify-center rounded-md hover:bg-white/5 text-muted-foreground hover:text-foreground"
+          onClick={toggleTheme}
+          className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-foreground/5 text-muted-foreground hover:text-foreground transition-colors"
+          aria-label="Toggle theme"
+          title={isDark ? "Switch to light" : "Switch to dark"}
         >
-          <Bell className="w-4 h-4" />
-          {notifications > 0 && (
-            <span className="absolute top-1.5 right-1.5 min-w-4 h-4 px-1 rounded-full bg-destructive text-[9px] font-mono flex items-center justify-center text-white">
-              {notifications}
-            </span>
-          )}
+          {isDark ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
         </button>
-        <button className="w-9 h-9 flex items-center justify-center rounded-md hover:bg-white/5 text-muted-foreground">
-          <Moon className="w-4 h-4" />
-        </button>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button
+              className="w-9 h-9 rounded-md flex items-center justify-center font-mono text-xs text-primary-foreground"
+              style={{ background: "var(--gradient-primary)" }}
+              aria-label="Account menu"
+            >
+              {initials}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end" className="w-56">
+            <DropdownMenuLabel className="flex flex-col gap-0.5">
+              <span className="text-sm">{user?.name}</span>
+              <span className="text-[11px] text-muted-foreground font-normal truncate">{user?.email}</span>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link to="/app/settings" className="cursor-pointer">
+                <UserIcon className="w-3.5 h-3.5 mr-2" /> Profile
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/app/settings" className="cursor-pointer">
+                <SettingsIcon className="w-3.5 h-3.5 mr-2" /> Settings
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={() => {
+                signOut();
+                navigate({ to: "/login" });
+              }}
+              className="text-destructive focus:text-destructive"
+            >
+              <LogOut className="w-3.5 h-3.5 mr-2" /> Sign out
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
         <button
           onClick={() => setOpen(true)}
           className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md text-sm font-medium text-primary-foreground"

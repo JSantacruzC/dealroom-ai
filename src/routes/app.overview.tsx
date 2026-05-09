@@ -4,7 +4,9 @@ import { useDataStore } from "@/store";
 import { useLiveFeed } from "@/hooks/useLiveFeed";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
 import { MiniSparkline, PipelineAreaChart, ReplyRateLineChart, StatusDonut, OutreachBarChart, HorizontalBarChart } from "@/components/charts";
-import { TrendingUp, TrendingDown } from "lucide-react";
+import { TrendingUp, TrendingDown, Plus, Users as UsersIcon, Plug, Target, X } from "lucide-react";
+import { useState } from "react";
+import { useAuthStore } from "@/store/auth";
 
 export const Route = createFileRoute("/app/overview")({
   component: Overview,
@@ -14,13 +16,61 @@ export const Route = createFileRoute("/app/overview")({
 function Overview() {
   useLiveFeed();
   const feed = useDataStore((s) => s.feed);
+  const user = useAuthStore((s) => s.user);
+  const [showOnboarding, setShowOnboarding] = useState(true);
+
+  const quickActions = [
+    { to: "/app/dealrooms", label: "Create DealRoom", desc: "Spin up your first war room", icon: Plus },
+    { to: "/app/stakeholders", label: "Add stakeholders", desc: "Map the buying committee", icon: UsersIcon },
+    { to: "/app/integrations", label: "Connect tools", desc: "Slack, Clay, Gemini & more", icon: Plug },
+    { to: "/app/settings", label: "Configure ICP", desc: "Tune scoring & routing", icon: Target },
+  ] as const;
 
   return (
     <div className="p-6 space-y-6 max-w-[1600px]">
       <div>
         <div className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Mission control</div>
         <h1 className="font-display text-3xl mt-1">Overview</h1>
+        {user && <p className="text-sm text-muted-foreground mt-1">Welcome back, {user.name.split(" ")[0]}.</p>}
       </div>
+
+      {showOnboarding && (
+        <div className="relative border-hairline rounded-lg p-5 bg-gradient-to-br from-primary/10 via-card to-card overflow-hidden">
+          <button
+            onClick={() => setShowOnboarding(false)}
+            className="absolute top-3 right-3 w-7 h-7 rounded-md hover:bg-foreground/5 text-muted-foreground hover:text-foreground flex items-center justify-center"
+            aria-label="Dismiss"
+          >
+            <X className="w-3.5 h-3.5" />
+          </button>
+          <div className="text-[10px] font-mono uppercase tracking-wider text-primary mb-1">Get started</div>
+          <h2 className="font-display text-lg">Set up your workspace in 4 steps</h2>
+          <p className="text-sm text-muted-foreground mt-1 mb-4">
+            Add what you need to start running real deals through the platform.
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+            {quickActions.map((a) => {
+              const Icon = a.icon;
+              return (
+                <Link
+                  key={a.label}
+                  to={a.to}
+                  className="border border-border rounded-md p-3 bg-card hover:border-primary/40 hover:bg-foreground/[0.02] transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 rounded-md bg-primary/10 border border-primary/30 text-primary flex items-center justify-center">
+                      <Icon className="w-3.5 h-3.5" />
+                    </div>
+                    <div className="text-sm font-medium">{a.label}</div>
+                  </div>
+                  <div className="text-[11px] text-muted-foreground mt-2">{a.desc}</div>
+                </Link>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
 
       {/* KPI row */}
       <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-4 xl:grid-cols-8 gap-3">

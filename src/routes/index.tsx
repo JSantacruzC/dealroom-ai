@@ -1,12 +1,18 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Zap, Brain, Users, Mic, Link2, BarChart3, ArrowRight, Play } from "lucide-react";
 import { AnimatedNumber } from "@/components/common/AnimatedNumber";
+import { useState } from "react";
+import { DemoModal } from "@/components/landing/DemoModal";
+import { useAuthStore } from "@/store/auth";
 
 export const Route = createFileRoute("/")({
   component: Landing,
 });
 
 function Landing() {
+  const [demoOpen, setDemoOpen] = useState(false);
+  const user = useAuthStore((s) => s.user);
+  const launchTo = user ? "/app/overview" : "/login";
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
@@ -24,8 +30,8 @@ function Landing() {
             <a href="#metrics" className="hover:text-foreground">Metrics</a>
             <a href="#integrations" className="hover:text-foreground">Integrations</a>
           </div>
-          <Link to="/app/overview" className="text-sm font-medium px-4 py-1.5 rounded-md text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
-            Launch app
+          <Link to={launchTo} className="text-sm font-medium px-4 py-1.5 rounded-md text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+            {user ? "Launch app" : "Sign in"}
           </Link>
         </div>
       </nav>
@@ -48,12 +54,16 @@ function Landing() {
             DealRoom Orchestrator coordinates your entire sales team around every account — automatically.
           </p>
           <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-            <Link to="/app/overview" className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium text-primary-foreground shadow-glow" style={{ background: "var(--gradient-primary)" }}>
+            <Link to={launchTo} className="inline-flex items-center gap-2 px-5 py-3 rounded-md font-medium text-primary-foreground shadow-glow" style={{ background: "var(--gradient-primary)" }}>
               Launch DealRoom <ArrowRight className="w-4 h-4" />
             </Link>
-            <a href="#how" className="inline-flex items-center gap-2 px-5 py-3 rounded-md border border-border bg-card hover:bg-white/5">
+            <button
+              type="button"
+              onClick={() => setDemoOpen(true)}
+              className="inline-flex items-center gap-2 px-5 py-3 rounded-md border border-border bg-card hover:bg-foreground/5"
+            >
               <Play className="w-4 h-4" /> Watch demo
-            </a>
+            </button>
           </div>
 
           {/* Floating preview card */}
@@ -208,7 +218,7 @@ function Landing() {
           <div className="relative">
             <h2 className="font-display text-4xl md:text-5xl mb-4">Ready to orchestrate your pipeline?</h2>
             <p className="text-muted-foreground max-w-xl mx-auto mb-8">Open the app — no signup, no card, fully interactive demo.</p>
-            <Link to="/app/overview" className="inline-flex items-center gap-2 px-6 py-3 rounded-md font-medium text-primary-foreground shadow-glow" style={{ background: "var(--gradient-primary)" }}>
+            <Link to={launchTo} className="inline-flex items-center gap-2 px-6 py-3 rounded-md font-medium text-primary-foreground shadow-glow" style={{ background: "var(--gradient-primary)" }}>
               Launch DealRoom <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -228,6 +238,8 @@ function Landing() {
           <div>© 2026</div>
         </div>
       </footer>
+
+      <DemoModal open={demoOpen} onOpenChange={setDemoOpen} />
     </div>
   );
 }

@@ -4,7 +4,8 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { Building2, Target, Users, Bell, Brain, Palette } from "lucide-react";
+import { Building2, Target, Users, Bell, Brain, Palette, Check } from "lucide-react";
+import { useThemeStore, ACCENT_PRESETS, type ThemeMode } from "@/store/theme";
 
 export const Route = createFileRoute("/app/settings")({ component: SettingsPage });
 
@@ -21,6 +22,10 @@ function SettingsPage() {
   const [active, setActive] = useState<typeof sections[number]["key"]>("Workspace");
   const [icpThreshold, setIcpThreshold] = useState([70]);
   const [creativity, setCreativity] = useState([60]);
+  const theme = useThemeStore((s) => s.theme);
+  const setTheme = useThemeStore((s) => s.setTheme);
+  const accent = useThemeStore((s) => s.accent);
+  const setAccent = useThemeStore((s) => s.setAccent);
 
   return (
     <div className="p-6">
@@ -178,9 +183,61 @@ function SettingsPage() {
 
           {active === "Appearance" && (
             <div className="border-hairline rounded-lg p-6 bg-card space-y-5">
-              <Field label="Theme"><div className="flex gap-2">{["Dark", "Light", "System"].map((t, i) => <button key={t} className={`px-3 py-1.5 rounded border text-sm ${i === 0 ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:text-foreground"}`}>{t}</button>)}</div></Field>
-              <Field label="Accent color"><div className="flex gap-2">{["#6366F1", "#22D3EE", "#10B981", "#F59E0B", "#F43F5E", "#A78BFA"].map((c, i) => <button key={c} className={`w-8 h-8 rounded ${i === 0 ? "ring-2 ring-offset-2 ring-offset-card ring-primary" : ""}`} style={{ background: c }} />)}</div></Field>
-              <Field label="Density"><div className="flex gap-2">{["Compact", "Comfortable", "Spacious"].map((d, i) => <button key={d} className={`px-3 py-1.5 rounded border text-sm ${i === 1 ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}>{d}</button>)}</div></Field>
+              <Field label="Theme">
+                <div className="flex gap-2">
+                  {(["dark", "light", "system"] as ThemeMode[]).map((t) => (
+                    <button
+                      key={t}
+                      onClick={() => setTheme(t)}
+                      className={`px-3 py-1.5 rounded border text-sm capitalize transition-colors ${
+                        theme === t
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:text-foreground"
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </Field>
+              <Field label="Accent color">
+                <div className="flex gap-2 flex-wrap">
+                  {ACCENT_PRESETS.map((p) => (
+                    <button
+                      key={p.hex}
+                      onClick={() => setAccent(p.hex)}
+                      title={p.name}
+                      className={`relative w-8 h-8 rounded transition-transform hover:scale-110 ${
+                        accent.toLowerCase() === p.hex.toLowerCase()
+                          ? "ring-2 ring-offset-2 ring-offset-card ring-primary"
+                          : ""
+                      }`}
+                      style={{ background: p.hex }}
+                    >
+                      {accent.toLowerCase() === p.hex.toLowerCase() && (
+                        <Check className="w-4 h-4 absolute inset-0 m-auto text-white" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+                <div className="text-[10px] font-mono text-muted-foreground mt-1">
+                  Updates primary color, gradients, and rings across the app.
+                </div>
+              </Field>
+              <Field label="Density">
+                <div className="flex gap-2">
+                  {["Compact", "Comfortable", "Spacious"].map((d, i) => (
+                    <button
+                      key={d}
+                      className={`px-3 py-1.5 rounded border text-sm ${
+                        i === 1 ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"
+                      }`}
+                    >
+                      {d}
+                    </button>
+                  ))}
+                </div>
+              </Field>
               <Toggle label="Show dot grid background on canvases" defaultChecked />
               <Toggle label="Reduce motion" />
             </div>
