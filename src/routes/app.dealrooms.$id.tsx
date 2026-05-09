@@ -5,10 +5,10 @@ import { DealStatusBadge, RoleBadge, StakeholderStatusBadge, InfluenceDots } fro
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
-import { cannedResponses, fallbackResponse } from "@/services/mock/analytics";
 import { toast } from "sonner";
-import { Send, Mic, Phone, Check, SkipForward, Bot, Loader2 } from "lucide-react";
-import type { ChatMessage, Stakeholder } from "@/types";
+import { Mic, Phone, Check, SkipForward, Bot } from "lucide-react";
+import type { Stakeholder } from "@/types";
+import { DealCaptainChat } from "@/components/dealrooms/DealCaptainChat";
 
 export const Route = createFileRoute("/app/dealrooms/$id")({
   component: DealRoomDetail,
