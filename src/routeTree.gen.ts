@@ -13,6 +13,7 @@ import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppOverviewRouteImport } from './routes/app.overview'
 import { Route as AppDealroomsRouteImport } from './routes/app.dealrooms'
+import { Route as AppDealroomsIdRouteImport } from './routes/app.dealrooms.$id'
 
 const AppRoute = AppRouteImport.update({
   id: '/app',
@@ -34,32 +35,51 @@ const AppDealroomsRoute = AppDealroomsRouteImport.update({
   path: '/dealrooms',
   getParentRoute: () => AppRoute,
 } as any)
+const AppDealroomsIdRoute = AppDealroomsIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
+  getParentRoute: () => AppDealroomsRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
-  '/app/dealrooms': typeof AppDealroomsRoute
+  '/app/dealrooms': typeof AppDealroomsRouteWithChildren
   '/app/overview': typeof AppOverviewRoute
+  '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
-  '/app/dealrooms': typeof AppDealroomsRoute
+  '/app/dealrooms': typeof AppDealroomsRouteWithChildren
   '/app/overview': typeof AppOverviewRoute
+  '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
-  '/app/dealrooms': typeof AppDealroomsRoute
+  '/app/dealrooms': typeof AppDealroomsRouteWithChildren
   '/app/overview': typeof AppOverviewRoute
+  '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/app' | '/app/dealrooms' | '/app/overview'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/app/dealrooms'
+    | '/app/overview'
+    | '/app/dealrooms/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/app' | '/app/dealrooms' | '/app/overview'
-  id: '__root__' | '/' | '/app' | '/app/dealrooms' | '/app/overview'
+  to: '/' | '/app' | '/app/dealrooms' | '/app/overview' | '/app/dealrooms/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/app/dealrooms'
+    | '/app/overview'
+    | '/app/dealrooms/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -97,16 +117,35 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppDealroomsRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/dealrooms/$id': {
+      id: '/app/dealrooms/$id'
+      path: '/$id'
+      fullPath: '/app/dealrooms/$id'
+      preLoaderRoute: typeof AppDealroomsIdRouteImport
+      parentRoute: typeof AppDealroomsRoute
+    }
   }
 }
 
+interface AppDealroomsRouteChildren {
+  AppDealroomsIdRoute: typeof AppDealroomsIdRoute
+}
+
+const AppDealroomsRouteChildren: AppDealroomsRouteChildren = {
+  AppDealroomsIdRoute: AppDealroomsIdRoute,
+}
+
+const AppDealroomsRouteWithChildren = AppDealroomsRoute._addFileChildren(
+  AppDealroomsRouteChildren,
+)
+
 interface AppRouteChildren {
-  AppDealroomsRoute: typeof AppDealroomsRoute
+  AppDealroomsRoute: typeof AppDealroomsRouteWithChildren
   AppOverviewRoute: typeof AppOverviewRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
-  AppDealroomsRoute: AppDealroomsRoute,
+  AppDealroomsRoute: AppDealroomsRouteWithChildren,
   AppOverviewRoute: AppOverviewRoute,
 }
 
