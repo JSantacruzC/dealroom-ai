@@ -1,6 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
 import { useDataStore } from "@/store";
 import { RoleBadge, StakeholderStatusBadge, InfluenceDots } from "@/components/common/Badges";
+import { StakeholderDrawer } from "@/components/stakeholders/StakeholderDrawer";
+import type { Stakeholder } from "@/types";
 
 export const Route = createFileRoute("/app/stakeholders")({
   component: StakeholdersPage,
@@ -10,6 +13,7 @@ function StakeholdersPage() {
   const stakeholders = useDataStore((s) => s.stakeholders);
   const companies = useDataStore((s) => s.companies);
   const companyName = (id: string) => companies.find((c) => c.id === id)?.name ?? "—";
+  const [selected, setSelected] = useState<Stakeholder | null>(null);
 
   return (
     <div className="p-6 space-y-6">
@@ -53,10 +57,10 @@ function StakeholdersPage() {
           </thead>
           <tbody className="divide-y divide-border">
             {stakeholders.map((s) => (
-              <tr key={s.id} className="hover:bg-white/[0.02]">
+              <tr key={s.id} className="hover:bg-white/[0.03] cursor-pointer transition-colors" onClick={() => setSelected(s)}>
                 <td className="p-3 font-medium">{s.name}</td>
                 <td className="p-3 text-muted-foreground">{s.title}</td>
-                <td className="p-3"><Link to={`/app/dealrooms/${s.companyId}`} className="text-primary hover:underline">{companyName(s.companyId)}</Link></td>
+                <td className="p-3" onClick={(e) => e.stopPropagation()}><Link to="/app/dealrooms/$id" params={{ id: s.companyId }} className="text-primary hover:underline">{companyName(s.companyId)}</Link></td>
                 <td className="p-3"><RoleBadge role={s.role} /></td>
                 <td className="p-3"><InfluenceDots value={s.influence} /></td>
                 <td className="p-3"><StakeholderStatusBadge status={s.status} /></td>
@@ -67,6 +71,8 @@ function StakeholdersPage() {
           </tbody>
         </table>
       </div>
+
+      <StakeholderDrawer stakeholder={selected} open={!!selected} onOpenChange={(o) => !o && setSelected(null)} />
     </div>
   );
 }
