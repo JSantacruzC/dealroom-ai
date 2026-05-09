@@ -11,9 +11,15 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppTouchpointsRouteImport } from './routes/app.touchpoints'
 import { Route as AppStakeholdersRouteImport } from './routes/app.stakeholders'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppOverviewRouteImport } from './routes/app.overview'
+import { Route as AppIntelligenceRouteImport } from './routes/app.intelligence'
+import { Route as AppIntegrationsRouteImport } from './routes/app.integrations'
 import { Route as AppDealroomsRouteImport } from './routes/app.dealrooms'
+import { Route as AppAutomationsRouteImport } from './routes/app.automations'
+import { Route as AppAnalyticsRouteImport } from './routes/app.analytics'
 import { Route as AppDealroomsIdRouteImport } from './routes/app.dealrooms.$id'
 
 const AppRoute = AppRouteImport.update({
@@ -26,9 +32,19 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppTouchpointsRoute = AppTouchpointsRouteImport.update({
+  id: '/touchpoints',
+  path: '/touchpoints',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppStakeholdersRoute = AppStakeholdersRouteImport.update({
   id: '/stakeholders',
   path: '/stakeholders',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
   getParentRoute: () => AppRoute,
 } as any)
 const AppOverviewRoute = AppOverviewRouteImport.update({
@@ -36,9 +52,29 @@ const AppOverviewRoute = AppOverviewRouteImport.update({
   path: '/overview',
   getParentRoute: () => AppRoute,
 } as any)
+const AppIntelligenceRoute = AppIntelligenceRouteImport.update({
+  id: '/intelligence',
+  path: '/intelligence',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIntegrationsRoute = AppIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDealroomsRoute = AppDealroomsRouteImport.update({
   id: '/dealrooms',
   path: '/dealrooms',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAutomationsRoute = AppAutomationsRouteImport.update({
+  id: '/automations',
+  path: '/automations',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAnalyticsRoute = AppAnalyticsRouteImport.update({
+  id: '/analytics',
+  path: '/analytics',
   getParentRoute: () => AppRoute,
 } as any)
 const AppDealroomsIdRoute = AppDealroomsIdRouteImport.update({
@@ -50,26 +86,44 @@ const AppDealroomsIdRoute = AppDealroomsIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/analytics': typeof AppAnalyticsRoute
+  '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
+  '/app/integrations': typeof AppIntegrationsRoute
+  '/app/intelligence': typeof AppIntelligenceRoute
   '/app/overview': typeof AppOverviewRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/analytics': typeof AppAnalyticsRoute
+  '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
+  '/app/integrations': typeof AppIntegrationsRoute
+  '/app/intelligence': typeof AppIntelligenceRoute
   '/app/overview': typeof AppOverviewRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteWithChildren
+  '/app/analytics': typeof AppAnalyticsRoute
+  '/app/automations': typeof AppAutomationsRoute
   '/app/dealrooms': typeof AppDealroomsRouteWithChildren
+  '/app/integrations': typeof AppIntegrationsRoute
+  '/app/intelligence': typeof AppIntelligenceRoute
   '/app/overview': typeof AppOverviewRoute
+  '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRouteTypes {
@@ -77,25 +131,43 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/app/analytics'
+    | '/app/automations'
     | '/app/dealrooms'
+    | '/app/integrations'
+    | '/app/intelligence'
     | '/app/overview'
+    | '/app/settings'
     | '/app/stakeholders'
+    | '/app/touchpoints'
     | '/app/dealrooms/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/app'
+    | '/app/analytics'
+    | '/app/automations'
     | '/app/dealrooms'
+    | '/app/integrations'
+    | '/app/intelligence'
     | '/app/overview'
+    | '/app/settings'
     | '/app/stakeholders'
+    | '/app/touchpoints'
     | '/app/dealrooms/$id'
   id:
     | '__root__'
     | '/'
     | '/app'
+    | '/app/analytics'
+    | '/app/automations'
     | '/app/dealrooms'
+    | '/app/integrations'
+    | '/app/intelligence'
     | '/app/overview'
+    | '/app/settings'
     | '/app/stakeholders'
+    | '/app/touchpoints'
     | '/app/dealrooms/$id'
   fileRoutesById: FileRoutesById
 }
@@ -120,11 +192,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/touchpoints': {
+      id: '/app/touchpoints'
+      path: '/touchpoints'
+      fullPath: '/app/touchpoints'
+      preLoaderRoute: typeof AppTouchpointsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/stakeholders': {
       id: '/app/stakeholders'
       path: '/stakeholders'
       fullPath: '/app/stakeholders'
       preLoaderRoute: typeof AppStakeholdersRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/overview': {
@@ -134,11 +220,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppOverviewRouteImport
       parentRoute: typeof AppRoute
     }
+    '/app/intelligence': {
+      id: '/app/intelligence'
+      path: '/intelligence'
+      fullPath: '/app/intelligence'
+      preLoaderRoute: typeof AppIntelligenceRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/integrations': {
+      id: '/app/integrations'
+      path: '/integrations'
+      fullPath: '/app/integrations'
+      preLoaderRoute: typeof AppIntegrationsRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/app/dealrooms': {
       id: '/app/dealrooms'
       path: '/dealrooms'
       fullPath: '/app/dealrooms'
       preLoaderRoute: typeof AppDealroomsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/automations': {
+      id: '/app/automations'
+      path: '/automations'
+      fullPath: '/app/automations'
+      preLoaderRoute: typeof AppAutomationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/analytics': {
+      id: '/app/analytics'
+      path: '/analytics'
+      fullPath: '/app/analytics'
+      preLoaderRoute: typeof AppAnalyticsRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/dealrooms/$id': {
@@ -164,15 +278,27 @@ const AppDealroomsRouteWithChildren = AppDealroomsRoute._addFileChildren(
 )
 
 interface AppRouteChildren {
+  AppAnalyticsRoute: typeof AppAnalyticsRoute
+  AppAutomationsRoute: typeof AppAutomationsRoute
   AppDealroomsRoute: typeof AppDealroomsRouteWithChildren
+  AppIntegrationsRoute: typeof AppIntegrationsRoute
+  AppIntelligenceRoute: typeof AppIntelligenceRoute
   AppOverviewRoute: typeof AppOverviewRoute
+  AppSettingsRoute: typeof AppSettingsRoute
   AppStakeholdersRoute: typeof AppStakeholdersRoute
+  AppTouchpointsRoute: typeof AppTouchpointsRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppAnalyticsRoute: AppAnalyticsRoute,
+  AppAutomationsRoute: AppAutomationsRoute,
   AppDealroomsRoute: AppDealroomsRouteWithChildren,
+  AppIntegrationsRoute: AppIntegrationsRoute,
+  AppIntelligenceRoute: AppIntelligenceRoute,
   AppOverviewRoute: AppOverviewRoute,
+  AppSettingsRoute: AppSettingsRoute,
   AppStakeholdersRoute: AppStakeholdersRoute,
+  AppTouchpointsRoute: AppTouchpointsRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
