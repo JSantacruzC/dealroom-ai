@@ -15,6 +15,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AppTouchpointsRouteImport } from './routes/app.touchpoints'
+import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppStakeholdersRouteImport } from './routes/app.stakeholders'
 import { Route as AppSettingsRouteImport } from './routes/app.settings'
 import { Route as AppOverviewRouteImport } from './routes/app.overview'
@@ -54,6 +55,11 @@ const IndexRoute = IndexRouteImport.update({
 const AppTouchpointsRoute = AppTouchpointsRouteImport.update({
   id: '/touchpoints',
   path: '/touchpoints',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppTeamRoute = AppTeamRouteImport.update({
+  id: '/team',
+  path: '/team',
   getParentRoute: () => AppRoute,
 } as any)
 const AppStakeholdersRoute = AppStakeholdersRouteImport.update({
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/app/overview': typeof AppOverviewRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/app/overview': typeof AppOverviewRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/app/overview': typeof AppOverviewRoute
   '/app/settings': typeof AppSettingsRoute
   '/app/stakeholders': typeof AppStakeholdersRoute
+  '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/settings'
     | '/app/stakeholders'
+    | '/app/team'
     | '/app/touchpoints'
     | '/app/dealrooms/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/settings'
     | '/app/stakeholders'
+    | '/app/team'
     | '/app/touchpoints'
     | '/app/dealrooms/$id'
   id:
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/app/overview'
     | '/app/settings'
     | '/app/stakeholders'
+    | '/app/team'
     | '/app/touchpoints'
     | '/app/dealrooms/$id'
   fileRoutesById: FileRoutesById
@@ -270,6 +282,13 @@ declare module '@tanstack/react-router' {
       path: '/touchpoints'
       fullPath: '/app/touchpoints'
       preLoaderRoute: typeof AppTouchpointsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/team': {
+      id: '/app/team'
+      path: '/team'
+      fullPath: '/app/team'
+      preLoaderRoute: typeof AppTeamRouteImport
       parentRoute: typeof AppRoute
     }
     '/app/stakeholders': {
@@ -366,6 +385,7 @@ interface AppRouteChildren {
   AppOverviewRoute: typeof AppOverviewRoute
   AppSettingsRoute: typeof AppSettingsRoute
   AppStakeholdersRoute: typeof AppStakeholdersRoute
+  AppTeamRoute: typeof AppTeamRoute
   AppTouchpointsRoute: typeof AppTouchpointsRoute
 }
 
@@ -378,6 +398,7 @@ const AppRouteChildren: AppRouteChildren = {
   AppOverviewRoute: AppOverviewRoute,
   AppSettingsRoute: AppSettingsRoute,
   AppStakeholdersRoute: AppStakeholdersRoute,
+  AppTeamRoute: AppTeamRoute,
   AppTouchpointsRoute: AppTouchpointsRoute,
 }
 
