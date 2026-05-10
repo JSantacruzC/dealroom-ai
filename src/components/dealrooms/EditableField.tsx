@@ -19,20 +19,15 @@ export function EditableField({ label, value, placeholder = "—", type = "text"
   const display = value === null || value === undefined || value === "" || value === 0 ? null : String(value);
 
   if (editing && !readOnly) {
-    const Common = multiline ? "textarea" : "input";
     return (
       <div className="space-y-1">
         <div className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{label}</div>
         <div className="flex gap-1.5 items-start">
-          <Common
-            // @ts-expect-error union element
-            type={type}
-            value={draft}
-            onChange={(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => setDraft(e.target.value)}
-            autoFocus
-            rows={multiline ? 3 : undefined}
-            className="flex-1 text-xs bg-surface border border-border rounded px-2 py-1.5 focus:outline-none focus:border-primary"
-          />
+          {multiline ? (
+            <textarea value={draft} onChange={(e) => setDraft(e.target.value)} autoFocus rows={3} className="flex-1 text-xs bg-surface border border-border rounded px-2 py-1.5 focus:outline-none focus:border-primary" />
+          ) : (
+            <input type={type} value={draft} onChange={(e) => setDraft(e.target.value)} autoFocus className="flex-1 text-xs bg-surface border border-border rounded px-2 py-1.5 focus:outline-none focus:border-primary" />
+          )}
           <button onClick={() => { onSave(draft); setEditing(false); }} className="p-1.5 rounded bg-primary/10 text-primary hover:bg-primary/20"><Check className="w-3 h-3" /></button>
           <button onClick={() => { setDraft(String(value ?? "")); setEditing(false); }} className="p-1.5 rounded text-muted-foreground hover:bg-foreground/5"><X className="w-3 h-3" /></button>
         </div>
