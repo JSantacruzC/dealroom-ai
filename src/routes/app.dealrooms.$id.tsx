@@ -28,6 +28,7 @@ function DealRoomDetail() {
   const { data: company, isLoading } = useCompany(id);
   const { data: stakeholders = [] } = useStakeholders(id);
   const update = useUpdateCompany();
+  const upsertStake = useUpsertStakeholder(id);
   const [enrichOpen, setEnrichOpen] = useState(false);
   const [addStakeOpen, setAddStakeOpen] = useState(false);
 
