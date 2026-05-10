@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
 function Landing() {
   const [demoOpen, setDemoOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
-  const launchTo = user ? "/app/overview" : "/login";
+  const launchTo = user ? "/app/overview" : "/signup";
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
