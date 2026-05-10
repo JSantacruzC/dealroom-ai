@@ -1,102 +1,53 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { useState, useEffect } from "react";
-import { Check, Loader2 } from "lucide-react";
-import { useDataStore } from "@/store";
+import { useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { toast } from "sonner";
-import type { Company } from "@/types";
-
-const steps = ["Enriching firmographics", "Generating intelligence", "Creating Slack channel", "Ready"];
+import { useCreateCompany } from "@/hooks/useDealrooms";
+import { Loader2 } from "lucide-react";
 
 export function NewDealRoomModal({ open, onOpenChange }: { open: boolean; onOpenChange: (v: boolean) => void }) {
   const [name, setName] = useState("");
-  const [running, setRunning] = useState(false);
-  const [step, setStep] = useState(0);
-  const addCompany = useDataStore((s) => s.addCompany);
+  const [domain, setDomain] = useState("");
+  const create = useCreateCompany();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (!running) return;
-    if (step >= steps.length - 1) {
-      const id = name.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-      const newCo: Company = {
-        id,
-        name,
-        domain: `${id}.com`,
-        industry: "B2B SaaS",
-        stage: "Series B",
-        employees: 250,
-        employeeGrowth: "+22% YoY",
-        funding: "Series B — $40M",
-        hq: "San Francisco, CA",
-        techStack: ["Salesforce", "Outreach", "Slack"],
-        icpScore: 82,
-        status: "active",
-        whyNow: "Recent leadership change + aggressive hiring. Window opening.",
-        riskFlags: ["Vendor consolidation rumored"],
-        strategy: ["Lead with peer proof", "ROI-first framing"],
-        sdr: "Maya Rodriguez",
-        ae: "Tom Hartwell",
-        replyRate: 0,
-        lastActivity: "just now",
-        createdAt: new Date().toISOString().slice(0, 10),
-      };
-      setTimeout(() => {
-        addCompany(newCo);
-        toast.success(`DealRoom for ${name} ready`, { description: "Stakeholders enriched, intel generated." });
-        setRunning(false);
-        setStep(0);
-        setName("");
-        onOpenChange(false);
-        navigate({ to: `/app/dealrooms/${id}` });
-      }, 600);
-      return;
-    }
-    const t = setTimeout(() => setStep((s) => s + 1), 1100);
-    return () => clearTimeout(t);
-  }, [running, step, name, addCompany, navigate, onOpenChange]);
-
-  const start = () => {
+  const submit = async () => {
     if (!name.trim()) return;
-    setRunning(true);
-    setStep(0);
+    try {
+      const company = await create.mutateAsync({ name: name.trim(), domain: domain.trim() || undefined });
+      toast.success(`DealRoom for ${company.name} created`, { description: "Add data or enrich with AI." });
+      setName("");
+      setDomain("");
+      onOpenChange(false);
+      navigate({ to: "/app/dealrooms/$id", params: { id: company.id } });
+    } catch (e) {
+      toast.error("Could not create DealRoom", { description: (e as Error).message });
+    }
   };
 
   return (
-    <Dialog open={open} onOpenChange={(v) => { if (!running) onOpenChange(v); }}>
+    <Dialog open={open} onOpenChange={(v) => { if (!create.isPending) onOpenChange(v); }}>
       <DialogContent className="bg-card border-border">
         <DialogHeader>
           <DialogTitle className="font-display">New DealRoom</DialogTitle>
         </DialogHeader>
-        {!running ? (
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Company name</label>
-              <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Datadog" className="mt-2 bg-surface border-border" autoFocus />
-            </div>
-            <p className="text-xs text-muted-foreground">Clay will enrich firmographics, Gemini will generate the playbook, and a Slack war room will be created.</p>
-            <Button onClick={start} className="w-full" style={{ background: "var(--gradient-primary)" }}>Launch</Button>
+        <div className="space-y-4">
+          <div>
+            <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Company name</label>
+            <Input value={name} onChange={(e) => setName(e.target.value)} placeholder="e.g. Datadog" className="mt-2 bg-surface border-border" autoFocus />
           </div>
-        ) : (
-          <div className="space-y-3 py-2">
-            {steps.map((s, i) => (
-              <div key={s} className="flex items-center gap-3">
-                <div className="w-7 h-7 rounded-full flex items-center justify-center border border-border bg-surface">
-                  {i < step ? (
-                    <Check className="w-3.5 h-3.5 text-success" />
-                  ) : i === step ? (
-                    <Loader2 className="w-3.5 h-3.5 text-primary animate-spin" />
-                  ) : (
-                    <span className="text-[10px] font-mono text-muted-foreground">{i + 1}</span>
-                  )}
-                </div>
-                <span className={i <= step ? "text-foreground" : "text-muted-foreground"}>{s}</span>
-              </div>
-            ))}
+          <div>
+            <label className="text-xs font-mono uppercase tracking-wider text-muted-foreground">Domain (optional)</label>
+            <Input value={domain} onChange={(e) => setDomain(e.target.value)} placeholder="datadog.com" className="mt-2 bg-surface border-border" />
           </div>
-        )}
+          <p className="text-xs text-muted-foreground">An empty DealRoom will be created. Add stakeholders and intel manually, or use Enrich with AI inside the room.</p>
+          <Button onClick={submit} disabled={create.isPending || !name.trim()} className="w-full" style={{ background: "var(--gradient-primary)" }}>
+            {create.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+            Create DealRoom
+          </Button>
+        </div>
       </DialogContent>
     </Dialog>
   );
