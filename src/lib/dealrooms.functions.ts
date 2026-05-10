@@ -251,7 +251,7 @@ export const upsertStakeholder = createServerFn({ method: "POST" })
       role: data.role ?? null,
       influence: data.influence,
       status: data.status,
-      copy: data.copy ?? defaultCopy(data.name, data.title || ""),
+      copy: (data.copy ?? defaultCopy(data.name, data.title || "")) as never,
     };
     const q = data.id
       ? context.supabase.from("stakeholders").update(payload).eq("id", data.id).select("*").single()
