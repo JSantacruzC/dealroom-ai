@@ -128,19 +128,14 @@ function DealRoomDetail() {
         open={enrichOpen}
         onOpenChange={setEnrichOpen}
         company={company}
-        onApply={(patch) => save(patch)}
+        onApply={async (patch) => { await save(patch); }}
       />
       <AddStakeholderModal
         open={addStakeOpen}
         onOpenChange={setAddStakeOpen}
         companyId={company.id}
         companyName={company.name}
-        onSubmit={async (data) => {
-          const upsert = (await import("@/lib/dealrooms.functions")).upsertStakeholder;
-          await upsert({ data: data as never });
-          // invalidation via cache key change — refetch
-          window.dispatchEvent(new Event("focus"));
-        }}
+        onSubmit={async (data) => { await upsertStake.mutateAsync(data as never); }}
       />
     </div>
   );
