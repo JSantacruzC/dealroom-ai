@@ -221,14 +221,23 @@ export function DemoModal({ open, onOpenChange }: { open: boolean; onOpenChange:
                     Next <SkipForward className="w-3 h-3" />
                   </button>
                 ) : (
-                  <Link
-                    to="/login"
-                    onClick={() => onOpenChange(false)}
-                    className="px-4 py-1.5 rounded-md text-xs font-mono uppercase tracking-wider text-primary-foreground flex items-center gap-1.5"
-                    style={{ background: "var(--gradient-primary)" }}
-                  >
-                    Launch app <ArrowRight className="w-3 h-3" />
-                  </Link>
+                  <>
+                    <Link
+                      to="/demo/dealroom"
+                      onClick={() => onOpenChange(false)}
+                      className="px-3 py-1.5 rounded-md border border-border bg-surface/60 hover:bg-foreground/5 text-xs font-mono uppercase tracking-wider"
+                    >
+                      Explore demo
+                    </Link>
+                    <Link
+                      to="/signup"
+                      onClick={() => onOpenChange(false)}
+                      className="px-4 py-1.5 rounded-md text-xs font-mono uppercase tracking-wider text-primary-foreground flex items-center gap-1.5"
+                      style={{ background: "var(--gradient-primary)" }}
+                    >
+                      Sign up free <ArrowRight className="w-3 h-3" />
+                    </Link>
+                  </>
                 )}
               </div>
             </div>

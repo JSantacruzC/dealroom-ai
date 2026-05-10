@@ -14,6 +14,7 @@ import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as DemoDealroomRouteImport } from './routes/demo.dealroom'
 import { Route as AppTouchpointsRouteImport } from './routes/app.touchpoints'
 import { Route as AppTeamRouteImport } from './routes/app.team'
 import { Route as AppStakeholdersRouteImport } from './routes/app.stakeholders'
@@ -50,6 +51,11 @@ const AppRoute = AppRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DemoDealroomRoute = DemoDealroomRouteImport.update({
+  id: '/demo/dealroom',
+  path: '/demo/dealroom',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppTouchpointsRoute = AppTouchpointsRouteImport.update({
@@ -130,6 +136,7 @@ export interface FileRoutesByFullPath {
   '/app/stakeholders': typeof AppStakeholdersRoute
   '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
+  '/demo/dealroom': typeof DemoDealroomRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRoutesByTo {
@@ -149,6 +156,7 @@ export interface FileRoutesByTo {
   '/app/stakeholders': typeof AppStakeholdersRoute
   '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
+  '/demo/dealroom': typeof DemoDealroomRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRoutesById {
@@ -169,6 +177,7 @@ export interface FileRoutesById {
   '/app/stakeholders': typeof AppStakeholdersRoute
   '/app/team': typeof AppTeamRoute
   '/app/touchpoints': typeof AppTouchpointsRoute
+  '/demo/dealroom': typeof DemoDealroomRoute
   '/app/dealrooms/$id': typeof AppDealroomsIdRoute
 }
 export interface FileRouteTypes {
@@ -190,6 +199,7 @@ export interface FileRouteTypes {
     | '/app/stakeholders'
     | '/app/team'
     | '/app/touchpoints'
+    | '/demo/dealroom'
     | '/app/dealrooms/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/app/stakeholders'
     | '/app/team'
     | '/app/touchpoints'
+    | '/demo/dealroom'
     | '/app/dealrooms/$id'
   id:
     | '__root__'
@@ -228,6 +239,7 @@ export interface FileRouteTypes {
     | '/app/stakeholders'
     | '/app/team'
     | '/app/touchpoints'
+    | '/demo/dealroom'
     | '/app/dealrooms/$id'
   fileRoutesById: FileRoutesById
 }
@@ -238,6 +250,7 @@ export interface RootRouteChildren {
   ResetPasswordRoute: typeof ResetPasswordRoute
   SignupRoute: typeof SignupRoute
   ApiChatRoute: typeof ApiChatRoute
+  DemoDealroomRoute: typeof DemoDealroomRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -275,6 +288,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/demo/dealroom': {
+      id: '/demo/dealroom'
+      path: '/demo/dealroom'
+      fullPath: '/demo/dealroom'
+      preLoaderRoute: typeof DemoDealroomRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/touchpoints': {
@@ -411,6 +431,7 @@ const rootRouteChildren: RootRouteChildren = {
   ResetPasswordRoute: ResetPasswordRoute,
   SignupRoute: SignupRoute,
   ApiChatRoute: ApiChatRoute,
+  DemoDealroomRoute: DemoDealroomRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

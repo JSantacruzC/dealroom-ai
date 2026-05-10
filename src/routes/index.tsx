@@ -12,7 +12,7 @@ export const Route = createFileRoute("/")({
 function Landing() {
   const [demoOpen, setDemoOpen] = useState(false);
   const user = useAuthStore((s) => s.user);
-  const launchTo = user ? "/app/overview" : "/login";
+  const launchTo = user ? "/app/overview" : "/signup";
   return (
     <div className="min-h-screen bg-background text-foreground overflow-x-hidden">
       {/* Nav */}
@@ -30,7 +30,7 @@ function Landing() {
             <a href="#metrics" className="hover:text-foreground">Metrics</a>
             <a href="#integrations" className="hover:text-foreground">Integrations</a>
           </div>
-          <Link to={launchTo} className="text-sm font-medium px-4 py-1.5 rounded-md text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
+          <Link to={user ? "/app/overview" : "/login"} className="text-sm font-medium px-4 py-1.5 rounded-md text-primary-foreground" style={{ background: "var(--gradient-primary)" }}>
             {user ? "Launch app" : "Sign in"}
           </Link>
         </div>
