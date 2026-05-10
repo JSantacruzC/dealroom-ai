@@ -71,7 +71,7 @@ export function useUpsertStakeholder(companyId: string) {
   const fn = useServerFn(upsertStakeholder);
   const qc = useQueryClient();
   return useMutation({
-    mutationFn: (vars: Parameters<typeof fn>[0]["data"]) => fn({ data: vars }),
+    mutationFn: (vars: Record<string, unknown>) => fn({ data: vars as never }),
     onSuccess: () => qc.invalidateQueries({ queryKey: ["stakeholders", companyId] }),
   });
 }
