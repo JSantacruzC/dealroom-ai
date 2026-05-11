@@ -13,7 +13,9 @@ export const Route = createFileRoute("/app/dealrooms")({
 });
 
 function DealRooms() {
-  const { data: companies = [], isLoading } = useCompanies();
+  const query = useCompanies();
+  const companies = Array.isArray(query.data) ? query.data : [];
+  const isLoading = query.isLoading;
   const del = useDeleteCompany();
   const [open, setOpen] = useState(false);
 

@@ -11,6 +11,7 @@ import {
 import appCss from "../styles.css?url";
 import { Toaster } from "@/components/ui/sonner";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
+import "@/integrations/supabase/server-fn-fetch";
 
 function NotFoundComponent() {
   return (
